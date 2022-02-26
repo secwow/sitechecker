@@ -16,6 +16,11 @@
 		525ED04A27CA370100FB9307 /* RussianSiteCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED04927CA370100FB9307 /* RussianSiteCheckerTests.swift */; };
 		525ED05427CA370100FB9307 /* RussianSiteCheckerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED05327CA370100FB9307 /* RussianSiteCheckerUITests.swift */; };
 		525ED05627CA370100FB9307 /* RussianSiteCheckerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED05527CA370100FB9307 /* RussianSiteCheckerUITestsLaunchTests.swift */; };
+		525ED06327CA37F000FB9307 /* SitesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED06227CA37F000FB9307 /* SitesList.swift */; };
+		525ED06627CA389900FB9307 /* AvalibilityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED06527CA389900FB9307 /* AvalibilityViewModel.swift */; };
+		525ED06827CA39E300FB9307 /* AvalibilityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED06727CA39E300FB9307 /* AvalibilityTableViewCell.swift */; };
+		525ED06A27CA400600FB9307 /* ObservingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED06927CA400600FB9307 /* ObservingViewController.swift */; };
+		525ED06C27CA5A1900FB9307 /* URLSession+Private.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED06B27CA5A1900FB9307 /* URLSession+Private.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +54,11 @@
 		525ED04F27CA370100FB9307 /* RussianSiteCheckerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RussianSiteCheckerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		525ED05327CA370100FB9307 /* RussianSiteCheckerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RussianSiteCheckerUITests.swift; sourceTree = "<group>"; };
 		525ED05527CA370100FB9307 /* RussianSiteCheckerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RussianSiteCheckerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		525ED06227CA37F000FB9307 /* SitesList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SitesList.swift; sourceTree = "<group>"; };
+		525ED06527CA389900FB9307 /* AvalibilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvalibilityViewModel.swift; sourceTree = "<group>"; };
+		525ED06727CA39E300FB9307 /* AvalibilityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvalibilityTableViewCell.swift; sourceTree = "<group>"; };
+		525ED06927CA400600FB9307 /* ObservingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservingViewController.swift; sourceTree = "<group>"; };
+		525ED06B27CA5A1900FB9307 /* URLSession+Private.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Private.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +109,7 @@
 		525ED03127CA370000FB9307 /* RussianSiteChecker */ = {
 			isa = PBXGroup;
 			children = (
+				525ED06427CA387F00FB9307 /* Cells */,
 				525ED03227CA370000FB9307 /* AppDelegate.swift */,
 				525ED03427CA370000FB9307 /* SceneDelegate.swift */,
 				525ED03627CA370000FB9307 /* ViewController.swift */,
@@ -106,6 +117,9 @@
 				525ED03B27CA370100FB9307 /* Assets.xcassets */,
 				525ED03D27CA370100FB9307 /* LaunchScreen.storyboard */,
 				525ED04027CA370100FB9307 /* Info.plist */,
+				525ED06227CA37F000FB9307 /* SitesList.swift */,
+				525ED06927CA400600FB9307 /* ObservingViewController.swift */,
+				525ED06B27CA5A1900FB9307 /* URLSession+Private.swift */,
 			);
 			path = RussianSiteChecker;
 			sourceTree = "<group>";
@@ -125,6 +139,15 @@
 				525ED05527CA370100FB9307 /* RussianSiteCheckerUITestsLaunchTests.swift */,
 			);
 			path = RussianSiteCheckerUITests;
+			sourceTree = "<group>";
+		};
+		525ED06427CA387F00FB9307 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				525ED06527CA389900FB9307 /* AvalibilityViewModel.swift */,
+				525ED06727CA39E300FB9307 /* AvalibilityTableViewCell.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -258,8 +281,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				525ED06C27CA5A1900FB9307 /* URLSession+Private.swift in Sources */,
+				525ED06627CA389900FB9307 /* AvalibilityViewModel.swift in Sources */,
 				525ED03727CA370000FB9307 /* ViewController.swift in Sources */,
+				525ED06A27CA400600FB9307 /* ObservingViewController.swift in Sources */,
+				525ED06827CA39E300FB9307 /* AvalibilityTableViewCell.swift in Sources */,
 				525ED03327CA370000FB9307 /* AppDelegate.swift in Sources */,
+				525ED06327CA37F000FB9307 /* SitesList.swift in Sources */,
 				525ED03527CA370000FB9307 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
