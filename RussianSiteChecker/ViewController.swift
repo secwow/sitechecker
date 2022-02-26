@@ -9,7 +9,9 @@ import UIKit
 
 class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
-    var models = SitesList.sites.map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: true)}).sorted(by: { $0.name < $1.name })
+    var models = SitesList.sites.map({
+        AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: true)})
+        .sorted(by: { $0.name < $1.name })
     
     enum Section {
         case main
@@ -26,6 +28,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = dataSource
+        applySnapshot()
         checkAvalibility()
     }
     
@@ -45,12 +48,12 @@ class ViewController: UIViewController {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.appendItems(models.sorted(by: { $0.name < $1.name }))
-        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+        resetRequests()
         timer?.invalidate()
         timer = nil
     }
@@ -66,31 +69,45 @@ class ViewController: UIViewController {
     var requests: [URLSessionDataTask] = []
     
     func checkAvalibility() {
+        resetRequests()
+        
         for model in models {
             let request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 this.lock.lock()
-                guard let index = this.models.firstIndex(of: model) else {
+                guard let modelIndex = this.models.firstIndex(of: model) else {
                     return
                 }
-                this.models.remove(at: index)
+                
+                let model = this.models[modelIndex]
                 
                 if error != nil {
-                    this.models.append(.init(name: model.name, url: model.url, avaliable: false))
+                    model.avaliable = false
                 } else if let response = response as? HTTPURLResponse, 400..<599 ~= response.statusCode {
-                    print(response.statusCode)
-                    this.models.append(.init(name: model.name, url: model.url, avaliable: false))
+                    model.avaliable = false
                 } else {
-                    this.models.append(.init(name: model.name, url: model.url, avaliable: true))
+                    model.avaliable = true
                 }
-                this.applySnapshot()
+                
+                var newSnapshot = this.dataSource.snapshot()
+                newSnapshot.reloadItems([model])
+                this.dataSource.apply(newSnapshot, animatingDifferences: false)
+
                 this.lock.unlock()
             }
             dataTask.resume()
             
             requests.append(dataTask)
         }
+    }
+    
+    private func resetRequests() {
+        for request in requests {
+            request.cancel()
+        }
+        
+        self.requests = []
     }
 }
 

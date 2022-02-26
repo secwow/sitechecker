@@ -9,7 +9,6 @@ import Foundation
 
 enum SitesList {
     static let sites: [URL] = [
-        "http://localhost",
         "http://www.kremlin.ru/",
         "http://www.scrf.gov.ru/",
         "http://sovetnational.ru/",
