@@ -98,7 +98,7 @@ class ObservingViewController: UIViewController {
                     countOfFailed += 1
                 }
                 self?.lock.unlock()
-                os_log("Request number \(i) completed")
+                print("Request number \(i) completed")
                 group.leave()
             }
             dataTask.resume()
@@ -114,7 +114,7 @@ class ObservingViewController: UIViewController {
                 self?.avalibility = false
             }
             
-            os_log("Total request \(totalRequests) failed \(countOfFailed)")
+            print("Total request \(totalRequests) failed \(countOfFailed)")
 
             self?.observe()
         }

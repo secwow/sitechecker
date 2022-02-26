@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>RussianSiteChecker.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>3616F1FAC824B38D656E0659585DBB5DE3FFAD14</string>
+				<key>dateExpires</key>
+				<string>26.02.2023</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>DX34ZZXSN8.com.RussianSiteChecker</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>DX34ZZXSN8</string>
+				<key>get-task-allow</key>
+				<false/>
+				<key>keychain-access-groups</key>
+				<array>
+					<string>DX34ZZXSN8.com.RussianSiteChecker</string>
+				</array>
+			</dict>
+			<key>name</key>
+			<string>RussianSiteChecker.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>856619eb-1452-499c-a243-bdaedfd01863</string>
+				<key>dateExpires</key>
+				<string>26.02.2023</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: com.RussianSiteChecker</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>DX34ZZXSN8</string>
+				<key>name</key>
+				<string>Dmytro Rebenko</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>
