@@ -51,6 +51,11 @@ class ObservingViewController: UIViewController {
         checkAvailibilityButton.setTitle(checkingAvailibility ? "Checking ..." : "Check Availibility", for: .normal)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
     @IBAction func didObserveClicked(_ sender: Any) {
         checkingAvailibility.toggle()
         let title = checkingAvailibility ? "Checking ..." : "Check Availibility"

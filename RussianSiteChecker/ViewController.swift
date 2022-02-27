@@ -8,7 +8,11 @@
 import UIKit
 
 class ViewController: UIViewController {
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
+    typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
+    
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var availiableSitesLabel: UILabel!
     var models = SitesList.sites.map({
         AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: true)})
         .sorted(by: { $0.name < $1.name })
@@ -19,18 +23,18 @@ class ViewController: UIViewController {
     
     private lazy var dataSource = makeDataSource()
     private var lock = NSLock()
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
-    typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
-    
     var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.delegate = self
         tableView.dataSource = dataSource
         applySnapshot()
         checkAvalibility()
     }
+    
     
     func makeDataSource() -> DataSource {
         let dataSource = DataSource(
@@ -49,6 +53,11 @@ class ViewController: UIViewController {
         snapshot.appendSections([.main])
         snapshot.appendItems(models.sorted(by: { $0.name < $1.name }))
         dataSource.apply(snapshot, animatingDifferences: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -93,12 +102,20 @@ class ViewController: UIViewController {
                 var newSnapshot = this.dataSource.snapshot()
                 newSnapshot.reloadItems([model])
                 this.dataSource.apply(newSnapshot, animatingDifferences: false)
-
+                this.reloadCounter()
                 this.lock.unlock()
             }
             dataTask.resume()
             
             requests.append(dataTask)
+        }
+    }
+    
+    private func reloadCounter() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let countOfAvailiable = self.models.filter({ $0.avaliable == true }).count
+            self.availiableSitesLabel.text = "\(countOfAvailiable) из \(self.models.count) работает"
         }
     }
     
@@ -112,10 +129,6 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
-    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let model = dataSource.itemIdentifier(for: indexPath) else {
             return
