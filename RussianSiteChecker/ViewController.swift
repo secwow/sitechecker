@@ -44,6 +44,7 @@ class ViewController: UIViewController {
             cellProvider: { (tableView, indexPath, model) ->
                 UITableViewCell? in
                 let cell = tableView.dequeueReusableCell(withIdentifier: "avalibilityCell", for: indexPath) as! AvalibilityTableViewCell
+                cell.selectionStyle = .none
                 cell.setupWith(model: model)
                 return cell
             })
@@ -140,6 +141,7 @@ extension ViewController: UITableViewDelegate {
         vc.url = model.url
         vc.avalibility = model.avaliable
         navigationController?.pushViewController(vc, animated: false)
+        tableView.deselectRow(at: indexPath, animated: false)
     }
     
 }
