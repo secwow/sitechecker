@@ -17,8 +17,9 @@ class AvalibilityTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         backgroudView.layer.cornerRadius = 4.0
-        backgroudView.layer.shadowColor = UIColor.black.cgColor
+        backgroudView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.06).cgColor
         backgroudView.layer.shadowRadius = 20
+        backgroudView.layer.shadowOffset = .init(width: 0, height: 10)
 //        avalibilityView.backgroundColor = .green
     }
     
@@ -42,12 +43,12 @@ class AvalibilityTableViewCell: UITableViewCell {
     private var timer: Timer?
     
     private func startTimer() {
+        stopTimer()
         timer = .scheduledTimer(withTimeInterval: 0.5, repeats: true, block: { [weak self] timer in
             guard let self = self else { return }
-            let date = self.date.timeIntervalSinceNow
             let calendar = Calendar.current
-            let components = calendar.dateComponents([.minute, .second], from: Date(timeIntervalSinceNow: date))
-             let second = components.second ?? 0
+            let components = calendar.dateComponents([.minute, .second], from: self.date, to: Date())
+            let second = components.second ?? 0
             
             var resultString: String = "Обновлено "
             
