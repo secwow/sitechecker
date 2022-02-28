@@ -10,27 +10,23 @@ import OSLog
 
 class ObservingViewController: UIViewController {
     @IBOutlet weak var siteName: UILabel!
+    @IBOutlet weak var availibilityView: UIView!
     @IBOutlet weak var avalibilityLabel: UILabel!
-    var url: URL! {
+    @IBOutlet weak var lastUpdateLabel: UILabel!
+    @IBOutlet weak var siteURLLabel: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    
+    var model: (String, URL)! {
         didSet {
             guard isViewLoaded else { return }
-            setName(url)
+            siteURLLabel.text = model.1.absoluteString
+            siteName.text = model.0
         }
     }
+    
     private var lock = NSLock()
-    var avalibility: Bool {
-        get {
-            lock.lock()
-            defer { lock.unlock() }
-            return _avalibility
-        }
-        
-        set {
-            lock.lock()
-            defer { lock.unlock() }
-            _avalibility = newValue
-        }
-    }
+    var avalibility: Bool = false
+    
     private var _avalibility: Bool = true {
         didSet {
             guard isViewLoaded else { return }
@@ -46,9 +42,21 @@ class ObservingViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setName(url)
+        siteURLLabel.text = model.1.absoluteString
+        siteName.text = model.0
         setAvailiable(_avalibility)
-        checkAvailibilityButton.setTitle(checkingAvailibility ? "Checking ..." : "Check Availibility", for: .normal)
+        let layer0 = checkAvailibilityButton.layer
+        layer0.shadowColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0.33).cgColor
+        layer0.shadowOpacity = 1
+        layer0.shadowRadius = 35.89
+        layer0.shadowOffset = CGSize(width: 0.6, height: 8.38)
+        availibilityView.layer.cornerRadius = 8
+        setReloadingState(checkingAvailibility)
+        _avalibility = avalibility
+        let backButton = UIBarButtonItem()
+        backButton.title = "Назад"
+        self.navigationController?.navigationBar.topItem?.backBarButtonItem = backButton
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,17 +64,47 @@ class ObservingViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
+    @IBAction func copyTapped(_ sender: Any) {
+        UIPasteboard.general.string = model.1.absoluteString
+    }
+    
+    var animation: UIViewPropertyAnimator?
     @IBAction func didObserveClicked(_ sender: Any) {
         checkingAvailibility.toggle()
-        let title = checkingAvailibility ? "Checking ..." : "Check Availibility"
-        checkAvailibilityButton.setTitle(title, for: .normal)
+        setReloadingState(checkingAvailibility)
+        
         if checkingAvailibility == true {
+            updateLastUpdate()
             observe()
+        } else {
+            lastUpdateLabel.text = "Обновлено меньше секунды назад"
+            stopTimer()
+            stopCountdown()
         }
     }
     
+    func setReloadingState(_ on: Bool) {
+        animation?.stopAnimation(false)
+        let image: UIImage?
+        
+        if on {
+            image = .init(named: "loading")
+            loadingIndicator.startAnimating()
+
+        } else {
+            image = .init(named: "load")
+            loadingIndicator.stopAnimating()
+        }
+        
+        animation = .init(duration: 0.25, curve: .easeInOut, animations: { [weak self] in
+            self?.checkAvailibilityButton.setImage(image, for: .normal)
+        })
+        animation?.startAnimation()
+    }
+    
     private func setAvailiable(_ on: Bool) {
-        avalibilityLabel.text = on ? "Available" : "Not Available"
+        availibilityView.backgroundColor = on ? UIColor.green : UIColor(red: 0.8, green: 0.173, blue: 0.149, alpha: 1)
+        avalibilityLabel.text = on ? "Доступен" : "Не доступен"
         avalibilityLabel.textColor = on ? .green : .red
     }
     
@@ -86,7 +124,7 @@ class ObservingViewController: UIViewController {
     
     func observe() {
         resetRequests()
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
+        let request = URLRequest(url: model.1, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
         
         let group = DispatchGroup()
         
@@ -125,11 +163,61 @@ class ObservingViewController: UIViewController {
         }
     }
     
+    var timer: Timer?
+    var lastUpdateDate = Date()
+    
+    func updateLastUpdate()  {
+        stopTimer()
+        let timeInterval = arc4random() % 15
+        timer = .scheduledTimer(withTimeInterval: TimeInterval(timeInterval), repeats: false, block: { [weak self] _ in
+            guard let self = self else { return }
+            self.startCountdown()
+            self.lastUpdateDate = Date()
+            self.updateLastUpdate()
+        })
+    }
+    
+    var countdownTimer: Timer?
+
+    func startCountdown() {
+        stopCountdown()
+        countdownTimer = .scheduledTimer(withTimeInterval: TimeInterval(0.5), repeats: true, block: { [weak self] _ in
+            guard let self = self else { return }
+            let calendar = Calendar.current
+            let components = calendar.dateComponents([.minute, .second], from: self.lastUpdateDate, to: Date())
+            let second = components.second ?? 0
+
+            let resultString: String
+
+            if second > 0 {
+                resultString = "Обновлено \(second) секунд назад"
+            } else {
+                resultString = "Обновлено меньше секунды назад"
+            }
+
+            self.lastUpdateLabel.text = resultString
+            self.setAvailiable(self.avalibility)
+            self.updateLastUpdate()
+        })
+    }
+    
+    func stopCountdown() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+    }
+    
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if self.navigationController?.topViewController != self {
             shouldStopObserving = true
             resetRequests()
         }
+        stopTimer()
+        stopCountdown()
     }
 }

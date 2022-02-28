@@ -13,8 +13,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var availiableSitesLabel: UILabel!
-    var models = SitesList.sites.map({
-        AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: true)})
+    var models = SitesList.sitesWithNames.map({
+        AvalibilityViewModel(name: $0.0, url: $0.1, avaliable: true)})
         .sorted(by: { $0.name < $1.name })
     
     enum Section {
@@ -36,7 +36,6 @@ class ViewController: UIViewController {
         applySnapshot()
         checkAvalibility()
     }
-    
     
     func makeDataSource() -> DataSource {
         let dataSource = DataSource(
@@ -138,7 +137,7 @@ extension ViewController: UITableViewDelegate {
         }
         
         let vc = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "observeVC") as! ObservingViewController
-        vc.url = model.url
+        vc.model = (model.name, model.url)
         vc.avalibility = model.avaliable
         navigationController?.pushViewController(vc, animated: false)
         tableView.deselectRow(at: indexPath, animated: false)

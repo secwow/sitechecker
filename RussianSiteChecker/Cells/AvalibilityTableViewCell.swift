@@ -20,7 +20,6 @@ class AvalibilityTableViewCell: UITableViewCell {
         backgroudView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.06).cgColor
         backgroudView.layer.shadowRadius = 20
         backgroudView.layer.shadowOffset = .init(width: 0, height: 10)
-//        avalibilityView.backgroundColor = .green
     }
     
     override func prepareForReuse() {
@@ -50,10 +49,10 @@ class AvalibilityTableViewCell: UITableViewCell {
             let components = calendar.dateComponents([.minute, .second], from: self.date, to: Date())
             let second = components.second ?? 0
             
-            var resultString: String = "Обновлено "
+            let resultString: String
             
             if second > 0 {
-                resultString += "\(second) секунд назад"
+                resultString = "Обновлено \(second) секунд назад"
             } else {
                 resultString = "Обновлено недавно"
             }

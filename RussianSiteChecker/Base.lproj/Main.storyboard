@@ -362,50 +362,105 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Site name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rVf-CY-WuV">
-                                <rect key="frame" x="16" y="299" width="382" height="36"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <nil key="textColor"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rVf-CY-WuV">
+                                <rect key="frame" x="24" y="382" width="366" height="54.5"/>
+                                <string key="text">Министерство экономического
+развития Российской Федерации</string>
+                                <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="20"/>
+                                <color key="textColor" red="0.047058823530000002" green="0.12549019610000001" blue="0.2784313725" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Po9-5D-Cp2">
-                                <rect key="frame" x="139" y="420" width="136" height="31"/>
-                                <color key="backgroundColor" systemColor="systemGray4Color"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Посылается запрос..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kT9-BT-Jfb">
+                                <rect key="frame" x="122.5" y="344" width="169" height="22"/>
+                                <fontDescription key="fontDescription" name="OpenSans-SemiBold" family="Open Sans" pointSize="16"/>
+                                <color key="textColor" red="0.30980392159999998" green="0.36078431370000003" blue="0.46666666670000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="haE-Jh-C8C">
+                                <rect key="frame" x="98.5" y="347" width="16" height="16"/>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="16" id="BCj-GC-zgn"/>
+                                    <constraint firstAttribute="height" constant="16" id="zfr-K4-CVo"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Еще не обновлено" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I65-84-INl">
+                                <rect key="frame" x="24" y="468.5" width="366" height="22"/>
+                                <fontDescription key="fontDescription" name="OpenSans-SemiBold" family="Open Sans" pointSize="16"/>
+                                <color key="textColor" red="0.047058823530000002" green="0.12549019610000001" blue="0.2784313725" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="https://economy.gov.ru/" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rwl-lw-dRL">
+                                <rect key="frame" x="125" y="514.5" width="164" height="19.5"/>
+                                <fontDescription key="fontDescription" name="OpenSans-SemiBold" family="Open Sans" pointSize="14"/>
+                                <color key="textColor" red="0.30980392159999998" green="0.36078431370000003" blue="0.46666666670000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tgi-I4-x5d">
+                                <rect key="frame" x="124" y="108" width="166" height="166"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="166" id="Vhn-6Y-8ry"/>
+                                    <constraint firstAttribute="height" constant="166" id="oLX-CB-o8P"/>
+                                </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Check availability"/>
+                                <buttonConfiguration key="configuration" style="plain" image="loading" title=" "/>
                                 <connections>
-                                    <action selector="didObserveClicked:" destination="zti-VH-8Le" eventType="touchUpInside" id="P6l-0P-QiZ"/>
+                                    <action selector="didObserveClicked:" destination="zti-VH-8Le" eventType="touchUpInside" id="zWd-gy-z50"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Avaliable" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kT9-BT-Jfb">
-                                <rect key="frame" x="16" y="367" width="382" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.1117572791" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="kSZ-81-dt7">
+                                <rect key="frame" x="188.5" y="166" width="37" height="20"/>
+                                <color key="color" red="0.45490196078431372" green="0.30588235294117649" blue="0.13333333333333333" alpha="1" colorSpace="calibratedRGB"/>
+                            </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gdh-T1-WDI">
+                                <rect key="frame" x="101" y="516.5" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="FKt-I0-vnD"/>
+                                    <constraint firstAttribute="width" constant="16" id="mel-Sp-GVy"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="copy" title=" "/>
+                                <connections>
+                                    <action selector="copyTapped:" destination="zti-VH-8Le" eventType="touchUpInside" id="Mnd-Xs-aef"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="9Vu-YX-LHm"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="kT9-BT-Jfb" firstAttribute="leading" secondItem="9Vu-YX-LHm" secondAttribute="leading" constant="16" id="92z-vL-afH"/>
-                            <constraint firstItem="Po9-5D-Cp2" firstAttribute="centerX" secondItem="8rd-uF-404" secondAttribute="centerX" id="ROv-KI-OAl"/>
-                            <constraint firstItem="Po9-5D-Cp2" firstAttribute="top" secondItem="kT9-BT-Jfb" secondAttribute="bottom" constant="32" id="RRO-hj-Egg"/>
-                            <constraint firstItem="9Vu-YX-LHm" firstAttribute="trailing" secondItem="kT9-BT-Jfb" secondAttribute="trailing" constant="16" id="gqz-dh-Lgb"/>
-                            <constraint firstItem="kT9-BT-Jfb" firstAttribute="top" secondItem="rVf-CY-WuV" secondAttribute="bottom" constant="32" id="han-3q-jlz"/>
-                            <constraint firstItem="rVf-CY-WuV" firstAttribute="top" secondItem="9Vu-YX-LHm" secondAttribute="top" constant="255" id="iOj-wV-NhJ"/>
-                            <constraint firstItem="9Vu-YX-LHm" firstAttribute="trailing" secondItem="rVf-CY-WuV" secondAttribute="trailing" constant="16" id="ihY-8n-83f"/>
-                            <constraint firstItem="rVf-CY-WuV" firstAttribute="leading" secondItem="9Vu-YX-LHm" secondAttribute="leading" constant="16" id="jrm-RP-fak"/>
+                            <constraint firstItem="Rwl-lw-dRL" firstAttribute="top" secondItem="I65-84-INl" secondAttribute="bottom" constant="24" id="0eP-if-Im4"/>
+                            <constraint firstItem="9Vu-YX-LHm" firstAttribute="trailing" secondItem="rVf-CY-WuV" secondAttribute="trailing" constant="24" id="2F0-v9-M3o"/>
+                            <constraint firstItem="kT9-BT-Jfb" firstAttribute="centerX" secondItem="8rd-uF-404" secondAttribute="centerX" id="85P-dB-QBZ"/>
+                            <constraint firstItem="kT9-BT-Jfb" firstAttribute="leading" secondItem="haE-Jh-C8C" secondAttribute="trailing" constant="8" id="8jR-Lh-cr8"/>
+                            <constraint firstItem="rVf-CY-WuV" firstAttribute="top" secondItem="kT9-BT-Jfb" secondAttribute="bottom" constant="16" id="Ap4-RN-dIE"/>
+                            <constraint firstItem="I65-84-INl" firstAttribute="top" secondItem="rVf-CY-WuV" secondAttribute="bottom" constant="32" id="GWk-cJ-CK5"/>
+                            <constraint firstItem="gdh-T1-WDI" firstAttribute="centerY" secondItem="Rwl-lw-dRL" secondAttribute="centerY" id="M3I-eL-dyf"/>
+                            <constraint firstItem="Tgi-I4-x5d" firstAttribute="top" secondItem="9Vu-YX-LHm" secondAttribute="top" constant="64" id="NkS-js-9iZ"/>
+                            <constraint firstItem="Rwl-lw-dRL" firstAttribute="centerX" secondItem="8rd-uF-404" secondAttribute="centerX" id="Uor-mV-d3O"/>
+                            <constraint firstItem="Tgi-I4-x5d" firstAttribute="centerX" secondItem="8rd-uF-404" secondAttribute="centerX" id="Wh5-jo-QKB"/>
+                            <constraint firstItem="Rwl-lw-dRL" firstAttribute="leading" secondItem="gdh-T1-WDI" secondAttribute="trailing" constant="8" id="ZxE-LL-o3x"/>
+                            <constraint firstItem="haE-Jh-C8C" firstAttribute="centerY" secondItem="kT9-BT-Jfb" secondAttribute="centerY" id="cCZ-hw-rky"/>
+                            <constraint firstItem="kSZ-81-dt7" firstAttribute="centerX" secondItem="Tgi-I4-x5d" secondAttribute="centerX" id="g3G-Qe-6Y2"/>
+                            <constraint firstItem="kT9-BT-Jfb" firstAttribute="top" secondItem="Tgi-I4-x5d" secondAttribute="bottom" constant="70" id="kY4-cw-bU2"/>
+                            <constraint firstItem="kSZ-81-dt7" firstAttribute="centerY" secondItem="Tgi-I4-x5d" secondAttribute="centerY" constant="-15" id="nA1-UL-bFo"/>
+                            <constraint firstItem="rVf-CY-WuV" firstAttribute="leading" secondItem="9Vu-YX-LHm" secondAttribute="leading" constant="24" id="oHh-AA-g3m"/>
+                            <constraint firstItem="9Vu-YX-LHm" firstAttribute="trailing" secondItem="I65-84-INl" secondAttribute="trailing" constant="24" id="qby-GJ-0U4"/>
+                            <constraint firstItem="I65-84-INl" firstAttribute="leading" secondItem="9Vu-YX-LHm" secondAttribute="leading" constant="24" id="ysg-Ks-5DE"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="availibilityView" destination="haE-Jh-C8C" id="WeG-QD-80Q"/>
                         <outlet property="avalibilityLabel" destination="kT9-BT-Jfb" id="u0e-lO-lt3"/>
-                        <outlet property="checkAvailibilityButton" destination="Po9-5D-Cp2" id="ixc-O0-Z5g"/>
+                        <outlet property="checkAvailibilityButton" destination="Tgi-I4-x5d" id="rzg-Hg-knI"/>
+                        <outlet property="lastUpdateLabel" destination="I65-84-INl" id="ZYK-9E-7Ma"/>
+                        <outlet property="loadingIndicator" destination="kSZ-81-dt7" id="yok-nX-FDX"/>
                         <outlet property="siteName" destination="rVf-CY-WuV" id="nwM-ob-dlE"/>
+                        <outlet property="siteURLLabel" destination="Rwl-lw-dRL" id="pc2-Yi-wYu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lvR-KR-Isg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1836" y="917"/>
+            <point key="canvasLocation" x="-1836.2318840579712" y="916.74107142857133"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ZhE-wr-YSf">
@@ -430,11 +485,12 @@
         <image name="Group 27" width="312" height="128"/>
         <image name="Group 28" width="275" height="128"/>
         <image name="copy" width="22" height="22"/>
+        <image name="loading" width="366" height="366"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
-        <systemColor name="systemGray4Color">
-            <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
