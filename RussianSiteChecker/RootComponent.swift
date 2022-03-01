@@ -23,7 +23,7 @@ class RootCompontent {
         if Storage.shared.isOnboardingPassed {
             vc = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "SitesListViewController")
         } else {
-            vc = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "Onboarding")
+            vc = UIStoryboard(name: "Tutorial", bundle: .main).instantiateViewController(withIdentifier: "Onboarding")
         }
         
         window.rootViewController = vc

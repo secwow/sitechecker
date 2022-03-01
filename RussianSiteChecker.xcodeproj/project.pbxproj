@@ -37,6 +37,7 @@
 		528DD87827CBC785008D8498 /* RootComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528DD87727CBC785008D8498 /* RootComponent.swift */; };
 		528DD87A27CBC799008D8498 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528DD87927CBC799008D8498 /* Storage.swift */; };
 		EDA01F4927CE6EFA00D66A8E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = EDA01F4B27CE6EFA00D66A8E /* Localizable.strings */; };
+		EDA01F6E27CE950300D66A8E /* Tutorial.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EDA01F7027CE950300D66A8E /* Tutorial.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +93,9 @@
 		528DD87927CBC799008D8498 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		EDA01F4C27CE6F6300D66A8E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		EDA01F5027CE796500D66A8E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		EDA01F6F27CE950300D66A8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Tutorial.storyboard; sourceTree = "<group>"; };
+		EDA01F7127CE950700D66A8E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Tutorial.strings; sourceTree = "<group>"; };
+		EDA01F7327CE950D00D66A8E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Tutorial.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +151,7 @@
 				525ED03227CA370000FB9307 /* AppDelegate.swift */,
 				525ED03427CA370000FB9307 /* SceneDelegate.swift */,
 				525ED03627CA370000FB9307 /* ViewController.swift */,
+				EDA01F7027CE950300D66A8E /* Tutorial.storyboard */,
 				525ED03827CA370000FB9307 /* Main.storyboard */,
 				525ED03B27CA370100FB9307 /* Assets.xcassets */,
 				525ED03D27CA370100FB9307 /* LaunchScreen.storyboard */,
@@ -331,6 +336,7 @@
 				525ED03F27CA370100FB9307 /* LaunchScreen.storyboard in Resources */,
 				525ED03C27CA370100FB9307 /* Assets.xcassets in Resources */,
 				528DD87427CBAE11008D8498 /* OpenSans-Regular.ttf in Resources */,
+				EDA01F6E27CE950300D66A8E /* Tutorial.storyboard in Resources */,
 				525ED03A27CA370000FB9307 /* Main.storyboard in Resources */,
 				528DD86A27CBAE11008D8498 /* OpenSans-BoldItalic.ttf in Resources */,
 				EDA01F4927CE6EFA00D66A8E /* Localizable.strings in Resources */,
@@ -430,6 +436,16 @@
 				EDA01F5027CE796500D66A8E /* en */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		EDA01F7027CE950300D66A8E /* Tutorial.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EDA01F6F27CE950300D66A8E /* Base */,
+				EDA01F7127CE950700D66A8E /* en */,
+				EDA01F7327CE950D00D66A8E /* ru */,
+			);
+			name = Tutorial.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

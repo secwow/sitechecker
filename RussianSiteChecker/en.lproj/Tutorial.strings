@@ -1,0 +1,18 @@
+
+/* Class = "UILabel"; text = "Уведомления о работе\nгосударственных ресурсов"; ObjectID = "Nt7-a2-LVJ"; */
+"Nt7-a2-LVJ.text" = "Notifications about the working status of public resources";
+
+/* Class = "UILabel"; text = "Уведомления о работе\nгосударственных ресурсов"; ObjectID = "P99-cT-bug"; */
+"P99-cT-bug.text" = "Notifications about the working status of public resources";
+
+/* Class = "UIBarButtonItem"; title = "Пропустить"; ObjectID = "QCe-el-5TN"; */
+"QCe-el-5TN.title" = "Skip";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "zyz-hN-4gb"; */
+"zyz-hN-4gb.normalTitle" = "Next";
+
+/* Class = "UILabel"; text = "Instant notification of the availability of government sites."; ObjectID = "8SA-Mt-IFF"; */
+"8SA-Mt-IFF.text" = "Instant notification of the availability of government sites.";
+
+/* Class = "UILabel"; text = "Instant notification of the availability of government sites.в"; ObjectID = "2Ie-GO-jfL"; */
+"2Ie-GO-jfL.text" = "Instant notification of the availability of government sites.";

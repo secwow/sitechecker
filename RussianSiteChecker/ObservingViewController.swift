@@ -192,7 +192,7 @@ class ObservingViewController: UIViewController {
 
             let resultString: String
 
-            if second > 0 {
+            if second > 1 {
                 resultString = String(format: NSLocalizedString("update.n.seconds.ago.text", comment: ""), "\(second)")
             } else {
                 resultString = NSLocalizedString("less.than.second.ago.text", comment: "")

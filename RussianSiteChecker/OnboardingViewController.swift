@@ -71,7 +71,7 @@ class OnboardingViewController: UIViewController {
     
     private func showMainScreen() {
         Storage.shared.onboardingPassed()
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "SitesListViewController")
+        let vc = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "SitesListViewController")
         view.window?.rootViewController = vc
     }
 }

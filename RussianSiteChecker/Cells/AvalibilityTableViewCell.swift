@@ -34,7 +34,7 @@ class AvalibilityTableViewCell: UITableViewCell {
         self.nameLabel.text = model.name
         self.url = model.url
         self.avalibilityView.backgroundColor = model.avaliable ? UIColor.green : UIColor(red: 0.8, green: 0.173, blue: 0.149, alpha: 1)
-        self.lastUpdateCell.text = NSLocalizedString("recently.updated", comment: "")
+        self.lastUpdateCell.text = NSLocalizedString("less.than.second.ago.text", comment: "")
         date = Date()
         startTimer()
     }
@@ -51,7 +51,7 @@ class AvalibilityTableViewCell: UITableViewCell {
             
             let resultString: String
 
-            if second > 0 {
+            if second > 1 {
                 resultString = String(format: NSLocalizedString("update.n.seconds.ago.text", comment: ""), "\(second)")
             } else {
                 resultString = NSLocalizedString("less.than.second.ago.text", comment: "")
