@@ -38,8 +38,6 @@ class ViewController: UIViewController {
         tableView.estimatedRowHeight = UITableView.automaticDimension
         tableView.delegate = self
         tableView.dataSource = dataSource
-        tableView.backgroundColor = UIColor(red: 0.973, green: 0.974, blue: 0.977, alpha: 1)
-        view.backgroundColor = UIColor(red: 0.973, green: 0.974, blue: 0.977, alpha: 1)
         applySnapshot()
         checkAvalibility()
 
