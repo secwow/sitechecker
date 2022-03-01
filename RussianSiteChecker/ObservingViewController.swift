@@ -127,7 +127,8 @@ class ObservingViewController: UIViewController {
     
     func observe() {
         resetRequests()
-        let request = URLRequest(url: model.1, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
+        let url = model.1
+        var request: URLRequest = URLRequest(url: model.1, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
         
         let group = DispatchGroup()
         
@@ -136,6 +137,14 @@ class ObservingViewController: UIViewController {
         
         for i in 0..<totalRequests {
             group.enter()
+            if i % 10 == 0 {
+                let saltURL = model.1
+                let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
+                var comonents = URLComponents(string: model.1.absoluteString)
+                comonents?.queryItems = [queryComponents]
+                request =  URLRequest(url: comonents!.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
+            }
+            
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 self?.lock.lock()
                 if error != nil {
