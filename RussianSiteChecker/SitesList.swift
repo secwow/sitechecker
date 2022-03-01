@@ -67,6 +67,24 @@ enum SitesList {
     ].map { (name, url) -> (String, URL) in
         return (name, URL(string: url)!)
     }
-        
+    @UserDefault(key: "local_sites", defaultValue: [])
+    static var localSites: [String]
 }
+
+@propertyWrapper
+struct UserDefault<Value> {
+    let key: String
+    let defaultValue: Value
+    var container: UserDefaults = .standard
+
+    var wrappedValue: Value {
+        get {
+            return container.object(forKey: key) as? Value ?? defaultValue
+        }
+        set {
+            container.set(newValue, forKey: key)
+        }
+    }
+}
+
 

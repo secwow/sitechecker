@@ -36,7 +36,7 @@
                                     <attributedString key="attributedTitle">
                                         <fragment content="Далее">
                                             <attributes>
-                                                <font key="NSFont" size="17" name="OpenSans-SemiBold"/>
+                                                <font key="NSFont" metaFont="system" size="17"/>
                                             </attributes>
                                         </fragment>
                                     </attributedString>
@@ -95,11 +95,11 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vy0-yj-zLx">
-                                <rect key="frame" x="10" y="444.5" width="394" height="44"/>
+                                <rect key="frame" x="10" y="444.5" width="394" height="38.5"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Мгновенное оповещение о доступности государственных сайтов.">
                                         <attributes>
-                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                            <font key="NSFont" metaFont="system" size="16"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -143,11 +143,11 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="azq-u6-Wlj">
-                                <rect key="frame" x="10" y="471.5" width="394" height="44"/>
+                                <rect key="frame" x="10" y="471.5" width="394" height="38.5"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Мгновенное оповещение о доступности государственных сайтов.">
                                         <attributes>
-                                            <font key="NSFont" size="16" name="OpenSans-Regular"/>
+                                            <font key="NSFont" metaFont="system" size="16"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -300,12 +300,31 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Список веб-сайтов" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2LT-po-d1H">
+                            <stackView opaque="NO" contentMode="scaleToFill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="H8F-K3-lOf">
                                 <rect key="frame" x="8" y="120" width="398" height="25"/>
-                                <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="18"/>
-                                <color key="textColor" red="0.047058823529411764" green="0.12549019607843137" blue="0.27843137254901962" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Список веб-сайтов" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2LT-po-d1H">
+                                        <rect key="frame" x="0.0" y="0.0" width="376" height="25"/>
+                                        <fontDescription key="fontDescription" name="OpenSans-Bold" family="Open Sans" pointSize="18"/>
+                                        <color key="textColor" red="0.047058823529411764" green="0.12549019607843137" blue="0.27843137254901962" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9VX-Be-Erb">
+                                        <rect key="frame" x="376" y="1.5" width="22" height="22"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="22" id="HNn-4s-6P6"/>
+                                            <constraint firstAttribute="height" constant="22" id="Tpc-Tz-o9W"/>
+                                        </constraints>
+                                        <color key="tintColor" systemColor="systemGrayColor"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="plus" catalog="system"/>
+                                        <connections>
+                                            <action selector="addButtonTouched:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0S5-ob-y5T"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="42 из 46 работает" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2X9-aE-IGh">
                                 <rect key="frame" x="10" y="153" width="394" height="16.5"/>
                                 <fontDescription key="fontDescription" name="OpenSans-SemiBold" family="Open Sans" pointSize="12"/>
@@ -318,18 +337,19 @@
                         <constraints>
                             <constraint firstItem="y66-ak-4ir" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="15d-cA-qnd"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="2X9-aE-IGh" secondAttribute="trailing" constant="10" id="GuW-3W-w6W"/>
-                            <constraint firstItem="2LT-po-d1H" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="PAa-3B-DT1"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="2LT-po-d1H" secondAttribute="trailing" constant="8" id="TWa-Rd-tdT"/>
+                            <constraint firstItem="H8F-K3-lOf" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="Nj7-qZ-Dmq"/>
                             <constraint firstItem="y66-ak-4ir" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="a2A-Le-FNa"/>
                             <constraint firstItem="2X9-aE-IGh" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="bxe-a8-02b"/>
+                            <constraint firstItem="2X9-aE-IGh" firstAttribute="top" secondItem="H8F-K3-lOf" secondAttribute="bottom" constant="8" id="gLf-SL-mpb"/>
                             <constraint firstItem="y66-ak-4ir" firstAttribute="top" secondItem="2X9-aE-IGh" secondAttribute="bottom" constant="28" id="kec-b4-aaf"/>
-                            <constraint firstItem="2LT-po-d1H" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="32" id="mGM-4Q-9OW"/>
+                            <constraint firstItem="H8F-K3-lOf" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="32" id="lv0-yP-3Vc"/>
                             <constraint firstItem="y66-ak-4ir" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="pZ4-fZ-Jhd"/>
-                            <constraint firstItem="2X9-aE-IGh" firstAttribute="top" secondItem="2LT-po-d1H" secondAttribute="bottom" constant="8" id="rP5-YA-sWJ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="H8F-K3-lOf" secondAttribute="trailing" constant="8" id="xkQ-sL-odI"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="vNK-z0-SYG"/>
                     <connections>
+                        <outlet property="addButton" destination="9VX-Be-Erb" id="BFP-q8-pr2"/>
                         <outlet property="availiableSitesLabel" destination="2X9-aE-IGh" id="mSo-TO-IKb"/>
                         <outlet property="tableView" destination="y66-ak-4ir" id="dHQ-WO-It9"/>
                     </connections>
@@ -468,8 +488,12 @@
         <image name="Notifications" width="375" height="326"/>
         <image name="copy" width="22" height="22"/>
         <image name="loading" width="366" height="366"/>
+        <image name="plus" catalog="system" width="128" height="113"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGrayColor">
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
