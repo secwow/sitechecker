@@ -23,19 +23,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             self.window = window
             rootComponent?.start()
             
-            let customFont = UIFont(name: "OpenSans-SemiBold", size: 18)
+            let customFont = UIFont(name: "OpenSans-SemiBold", size: 18)!
             
             //navigation bar coloring:
-            UINavigationBar.appearance().tintColor = UIColor(red: 0.047, green: 0.126, blue: 0.278, alpha: 1)
-            UINavigationBar.appearance().barTintColor = UIColor.blue
-            
-            //unique text style:
-            var fontAttributes: [NSAttributedString.Key: Any]
-            fontAttributes = [NSAttributedString.Key.font: customFont]
-            
-            //navigation bar & navigation buttons font style:
-            UINavigationBar.appearance().titleTextAttributes = fontAttributes
-            UIBarButtonItem.appearance().setTitleTextAttributes(fontAttributes, for: .normal)
+            UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: customFont], for: .normal)
+
+//            UINavigationBar.appearance().barTintColor = UIColor.blue
+//
+//            //unique text style:
+//            var fontAttributes: [NSAttributedString.Key: Any]
+//            fontAttributes = [NSAttributedString.Key.font: customFont!]
+//
+//            //navigation bar & navigation buttons font style:
+//            UINavigationBar.appearance().titleTextAttributes = fontAttributes
+//            UIBarButtonItem.appearance().setTitleTextAttributes(fontAttributes, for: .normal)
         }
     }
 

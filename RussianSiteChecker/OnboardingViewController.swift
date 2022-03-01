@@ -12,6 +12,7 @@ class OnboardingViewController: UIViewController {
     private var pageController: UIPageViewController?
     private lazy var controllers = ["OnboardingFirst", "OnboardingSecond"]
         .map { self.storyboard!.instantiateViewController(withIdentifier: $0) }
+    @IBOutlet weak var skipButton: UIBarButtonItem!
     @IBOutlet weak var continueButton: UIButton!
     private var currentIndex = 0
     
@@ -26,7 +27,7 @@ class OnboardingViewController: UIViewController {
         view.addSubview(pageView)
         
         NSLayoutConstraint.activate([
-            pageView.topAnchor.constraint(equalTo: view.topAnchor),
+            pageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             pageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             pageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             pageView.bottomAnchor.constraint(equalTo: continueButton.topAnchor, constant: -20)
@@ -57,7 +58,7 @@ class OnboardingViewController: UIViewController {
             return
         }
         
-        if controllers.count < currentIndex + 1 {
+        if controllers.count > currentIndex + 1 {
             currentIndex += 1
         }
         
