@@ -10,7 +10,8 @@ import UIKit
 class ViewController: UIViewController {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
     typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
-    
+
+    @IBOutlet weak var titleTextLabel: UILabel!
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var availiableSitesLabel: UILabel!
@@ -41,6 +42,8 @@ class ViewController: UIViewController {
         view.backgroundColor = UIColor(red: 0.973, green: 0.974, blue: 0.977, alpha: 1)
         applySnapshot()
         checkAvalibility()
+
+        titleTextLabel.text = NSLocalizedString("website.list.text", comment: "")
     }
     
     func makeDataSource() -> DataSource {
@@ -66,16 +69,20 @@ class ViewController: UIViewController {
 
 
     @IBAction func addButtonTouched(_ sender: Any) {
-        let alert = UIAlertController(title: "Добавить веб-сайт", message: "Сайт должен иметь домен .ru", preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("add.website.title", comment: ""),
+                                      message: NSLocalizedString("add.website.message", comment: ""),
+                                      preferredStyle: .alert)
         alert.addTextField { textField in
             textField.placeholder = "rkn.gov.ru"
         }
 
-        let addAction = UIAlertAction(title: "Добавить", style: .default) { [weak self]_ in
+        let addAction = UIAlertAction(title: NSLocalizedString("add.website.add.button", comment: ""),
+                                      style: .default) { [weak self]_ in
             guard let textField = alert.textFields?.first else { return }
             self?.addWebsite(textField.text ?? "")
         }
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: NSLocalizedString("add.website.add.cancel", comment: ""),
+                                         style: .cancel, handler: nil)
 
         alert.addAction(addAction)
         alert.addAction(cancelAction)
@@ -109,7 +116,9 @@ class ViewController: UIViewController {
         guard str.hasPrefix("https://") || str.hasPrefix("http://")
                 && (str.hasSuffix(".ru") || str.hasSuffix(".ru/"))
         else {
-            let alert = UIAlertController(title: "Ошибка", message: "URL формат `https://ptn.pnh.ru`", preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("add.website.failure.title", comment: ""),
+                                          message: NSLocalizedString("add.website.failure.message", comment: ""),
+                                          preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true)
             return
@@ -188,8 +197,10 @@ class ViewController: UIViewController {
     private func reloadCounter() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let countOfAvailiable = self.models.filter({ $0.avaliable == true }).count
-            self.availiableSitesLabel.text = "\(countOfAvailiable) из \(self.models.count) работает"
+            let countOfAvailiable = (self.models + self.local)
+                .filter({ $0.avaliable == true })
+                .count
+            self.availiableSitesLabel.text = String(format: NSLocalizedString("active.websites.number.text", comment: ""), "\(countOfAvailiable)", "\(self.models.count)")
         }
     }
     

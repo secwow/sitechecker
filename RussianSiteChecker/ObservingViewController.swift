@@ -54,9 +54,10 @@ class ObservingViewController: UIViewController {
         setReloadingState(checkingAvailibility)
         _avalibility = avalibility
         let backButton = UIBarButtonItem()
-        backButton.title = "Назад"
+        backButton.title = NSLocalizedString("back.button", comment: "")
+        lastUpdateLabel.text = NSLocalizedString("not.updated.text", comment: "")
+        avalibilityLabel.text = NSLocalizedString("sending.request.text", comment: "")
         self.navigationController?.navigationBar.topItem?.backBarButtonItem = backButton
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -77,7 +78,7 @@ class ObservingViewController: UIViewController {
             updateLastUpdate()
             observe()
         } else {
-            lastUpdateLabel.text = "Обновлено меньше секунды назад"
+            lastUpdateLabel.text = NSLocalizedString("less.than.second.ago.text", comment: "")
             stopTimer()
             stopCountdown()
         }
@@ -104,7 +105,9 @@ class ObservingViewController: UIViewController {
     
     private func setAvailiable(_ on: Bool) {
         availibilityView.backgroundColor = on ? UIColor.green : UIColor(red: 0.8, green: 0.173, blue: 0.149, alpha: 1)
-        avalibilityLabel.text = on ? "Доступен" : "Не доступен"
+        avalibilityLabel.text = on
+        ? NSLocalizedString("available.text", comment: "")
+        : NSLocalizedString("not.available.text", comment: "")
         avalibilityLabel.textColor = on ? .green : .red
     }
     
@@ -190,9 +193,9 @@ class ObservingViewController: UIViewController {
             let resultString: String
 
             if second > 0 {
-                resultString = "Обновлено \(second) секунд назад"
+                resultString = String(format: NSLocalizedString("update.n.seconds.ago.text", comment: ""), "\(second)")
             } else {
-                resultString = "Обновлено меньше секунды назад"
+                resultString = NSLocalizedString("less.than.second.ago.text", comment: "")
             }
 
             self.lastUpdateLabel.text = resultString

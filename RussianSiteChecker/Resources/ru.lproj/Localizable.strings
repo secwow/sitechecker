@@ -1,0 +1,15 @@
+"back.button" = "Назад";
+"less.than.second.ago.text" = "Обновлено меньше секунды назад";
+"update.n.seconds.ago.text" = "Обновлено %@ секунд назад";
+"website.list.text" = "Список веб-сайтов";
+"active.websites.number.text" = "%@ из %@ работает";
+"add.website.title" = "Добавить веб-сайт";
+"add.website.message" = "Сайт должен иметь домен .ru";
+"add.website.add.button" = "Добавить";
+"add.website.add.cancel" = "Отмена";
+"add.website.failure.title" = "Ошибка";
+"add.website.failure.message" = "URL формат `https://rkn.gov.ru`";
+"available.text" = "Доступен";
+"not.available.text" = "Не доступен";
+"not.updated.text" = "Еще не обновлено";
+"sending.request.text" = "Посылается запрос...";

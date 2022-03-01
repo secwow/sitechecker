@@ -352,6 +352,7 @@
                         <outlet property="addButton" destination="9VX-Be-Erb" id="BFP-q8-pr2"/>
                         <outlet property="availiableSitesLabel" destination="2X9-aE-IGh" id="mSo-TO-IKb"/>
                         <outlet property="tableView" destination="y66-ak-4ir" id="dHQ-WO-It9"/>
+                        <outlet property="titleTextLabel" destination="2LT-po-d1H" id="XGl-L1-Su9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
