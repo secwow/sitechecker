@@ -40,7 +40,7 @@ class ViewController: UIViewController {
         tableView.dataSource = dataSource
         applySnapshot()
         checkAvalibility()
-
+        downloadLatestSiteToObserve()
         titleTextLabel.text = NSLocalizedString("website.list.text", comment: "")
     }
     
@@ -55,6 +55,14 @@ class ViewController: UIViewController {
                 return cell
             })
         return dataSource
+    }
+    
+    func downloadLatestSiteToObserve() {
+//        let url = URL(string: "https://raw.githubusercontent.com/hem017/cytro/master/targets_all.txt")
+//        URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
+//            let local = local
+//            print(String(data: data!, encoding: .utf8))
+//        }.resume()
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
