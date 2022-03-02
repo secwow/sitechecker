@@ -58,11 +58,24 @@ class ViewController: UIViewController {
     }
     
     func downloadLatestSiteToObserve() {
-//        let url = URL(string: "https://raw.githubusercontent.com/hem017/cytro/master/targets_all.txt")
-//        URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
-//            let local = local
-//            print(String(data: data!, encoding: .utf8))
-//        }.resume()
+        let url = URL(string: "ahttps://raw.githubusercontent.com/secwow/sitechecker/main/SitesToCheck")
+        URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
+            guard let data = data,
+                  let string = String(data: data, encoding: .utf8),
+                  let local = self?.local else {
+                return
+            }
+            
+            for site in string.split(separator: "\n") {
+                guard let url = URL(string: String(site)),
+                      local.contains(where: { $0.url  == url }) == false else {
+                    continue
+                }
+                
+                SitesList.localSites.insert(String(site), at: 0)
+            }
+            
+        }.resume()
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
