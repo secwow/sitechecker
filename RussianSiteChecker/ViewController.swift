@@ -208,21 +208,17 @@ class ViewController: UIViewController {
              print("Did set timer")
         }
     }
-    var operations: [URLRequest: Operation] = [:]
+    var operations: [Operation] = []
     let observingLock = NSRecursiveLock()
     let syncQueue = DispatchQueue(label: "sync.queue")
     
     func startObserving() {
-        
-        var isCancelled = false
-        queueTimer?.invalidate()
-        queueTimer = nil
         queueTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
             guard let this = self else { return }
             guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
             guard let model = this.models.first(where: \.avaliable) ?? this.local.first(where: \.avaliable) else { return }
             print("Start actively checking \(model.name)")
-            for i in 0..<this.maxThreads {
+            for _ in 0..<this.maxThreads {
                 var previousRequest: Operation?
                 let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
                 var comonents = URLComponents(string: model.url.absoluteString)
@@ -237,9 +233,7 @@ class ViewController: UIViewController {
                             switch result {
                             case let .failure(error):
                                 if case ObservedStatusOperation.RequestError.cancelled = error {
-                                    if this.operations[request] == nil { return }
                                     this.updateModelAvailability(model: model, available: true)
-                                    this.operations.removeValue(forKey: request)
                                     return
                                 }
                             default:
@@ -247,29 +241,30 @@ class ViewController: UIViewController {
                             }
                             
                             
-                            if (try? result.get()) == nil && isCancelled == false {
-                                isCancelled = true
+                            if (try? result.get()) == nil {
                                 this.updateModelAvailability(model: model, available: false)
                                 this.operations.removeAll()
                                 this.operationQueue.cancelAllOperations()
-                                this.startObserving()
                             } else {
-                                if this.operations[request] == nil { return }
-                                this.updateModelAvailability(model: model, available: isCancelled == false)
-                                this.operations.removeValue(forKey: request)
+                                this.updateModelAvailability(model: model, available: true)
                             }
                         }
                     }
-                    this.operations[request] = operation
+                    this.operations.append(operation)
                     
                     if let previousRequest = previousRequest {
                         operation.addDependency(previousRequest)
                     }
-                    this.operationQueue.addOperation(operation)
-                    let blockOperation = BlockOperation {
-                        this.operations.removeValue(forKey: request)
+                    let blockOperation = BlockOperation { [weak this] in
+                        _ = this?.syncQueue.sync {
+                            this?.operations.firstIndex(of: operation).flatMap { this?.operations.remove(at: $0) }
+                        }
                     }
-                    
+                    blockOperation.addDependency(operation)
+
+                    this.operationQueue.addOperation(operation)
+                    this.operationQueue.addOperation(blockOperation)
+
                     previousRequest = operation
                 }
             }
