@@ -24,17 +24,26 @@ class ObservedStatusOperation: ChainedAsyncResultOperation<Void, Int, ObservedSt
 //        guard input != nil else { return finish(with: .failure(RequestError.error)) }
         
         dataTask = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] (_, response, error) in
+            print(error)
             print(response?.url)
-            guard let self = self else { return }
+            if error != nil {
+                self?.finish(with: .failure(RequestError.error))
+                return
+            }
+            
+            guard let this = self else {
+                self?.finish(with: .failure(RequestError.error))
+                return
+            }
             guard let response = response as? HTTPURLResponse else {
-                self.finish(with: .failure(RequestError.error))
+                this.finish(with: .failure(RequestError.error))
                 return
             }
             
             if 304..<599 ~= response.statusCode && response.statusCode != 404 {
-                self.finish(with: .failure(RequestError.error))
+                this.finish(with: .failure(RequestError.error))
             } else {
-                self.finish(with: .success(response.statusCode))
+                this.finish(with: .success(response.statusCode))
             }
         })
         dataTask?.resume()
@@ -96,7 +105,6 @@ class ObservingViewController: UIViewController {
         lastUpdateLabel.text = NSLocalizedString("not.updated.text", comment: "")
         avalibilityLabel.text = NSLocalizedString("sending.request.text", comment: "")
         self.navigationController?.navigationBar.topItem?.backBarButtonItem = backButton
-        startObserving()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -226,80 +234,6 @@ class ObservingViewController: UIViewController {
         })
     }
     
-    lazy var operationQueue = { () -> OperationQueue in
-        let operationQueue = OperationQueue()
-        operationQueue.maxConcurrentOperationCount = self.maxThreads
-        return operationQueue
-    }()
-    let mapOperationsCount = 100
-    let maxThreads = 10
-    
-    var queueTimer: Timer?
-    var operations: [URLRequest: Operation] = [:]
-    let observingLock = NSRecursiveLock()
-    
-    func startObserving() {
-        
-        /// Take any availiable site
-        ///  Send availibility requests
-        ///  If one of them failed
-        ///  Choose another site - repeat:
-        queueTimer?.invalidate()
-        queueTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
-            guard let this = self else { return }
-            guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
-            guard let model = ViewController.models.first(where: \.avaliable) else { return }
-            
-            for i in 0..<this.maxThreads {
-                var previousRequest: Operation?
-                var request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
-                for _ in 0..<this.mapOperationsCount {
-                    if i % 10 != 0 {
-                        let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
-                        var comonents = URLComponents(string: model.url.absoluteString)
-                        comonents?.queryItems = [queryComponents]
-                        request = URLRequest(url: comonents!.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
-                    }
-                    
-                    let operation = ObservedStatusOperation(request: request)
-                    operation.onResult = { [weak self] result in
-                        switch result {
-                        case let .failure(error):
-                            if case ObservedStatusOperation.RequestError.cancelled = error {
-                                return
-                            }
-                        default:
-                            break
-                        }
-                        
-                        
-                        guard let this = self else { return }
-                        
-                        this.observingLock.lock()
-                        
-                        if (try? result.get()) == nil {
-                            this.operations.removeAll()
-                            this.operationQueue.cancelAllOperations()
-                            this.startObserving()
-                        } else {
-                            if this.operations[request] == nil { return }
-                            this.operations.removeValue(forKey: request)
-                        }
-                        this.observingLock.unlock()
-                    }
-                    this.operations[request] = operation
-                    
-                    if let previousRequest = previousRequest {
-                        operation.addDependency(previousRequest)
-                    }
-                    this.operationQueue.addOperation(operation)
-                    
-                    previousRequest = operation
-                }
-            }
-        })
-    }
-    
     var countdownTimer: Timer?
 
     func startCountdown() {
@@ -340,10 +274,6 @@ class ObservingViewController: UIViewController {
             shouldStopObserving = true
             resetRequests()
         }
-        queueTimer?.invalidate()
-        queueTimer = nil
-        operations.removeAll()
-        operationQueue.cancelAllOperations()
         stopTimer()
         stopCountdown()
     }

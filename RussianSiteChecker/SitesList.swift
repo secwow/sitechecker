@@ -9,7 +9,6 @@ import Foundation
 
 enum SitesList {
     static let sitesWithNames: [(String, URL)] = [
-        ("1Localhost", "http://127.0.0.1/"),
         ("Президент России", "http://www.kremlin.ru/"),
         ("Совет Безопасности Российской Федерации", "http://www.scrf.gov.ru/"),
         ("Совет Федерации", "http://sovetnational.ru/"),

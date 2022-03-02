@@ -15,12 +15,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var availiableSitesLabel: UILabel!
-    static var models = SitesList.sitesWithNames.map({
-        AvalibilityViewModel(name: $0.0, url: $0.1, avaliable: true)})
+    var models = SitesList.sitesWithNames.map({
+        AvalibilityViewModel(name: $0.0, url: $0.1, avaliable: false)})
         .sorted(by: { $0.name < $1.name })
     var local: [AvalibilityViewModel] = SitesList.localSites
         .map({ URL(string: $0)! })
-        .map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: true)})
+        .map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: false)})
         .sorted(by: { $0.name < $1.name })
     
     enum Section {
@@ -61,7 +61,7 @@ class ViewController: UIViewController {
         var snapshot = Snapshot()
         snapshot.appendSections([.local, .main])
         snapshot.appendItems(local, toSection: .local)
-        snapshot.appendItems(Self.models.sorted(by: { $0.name < $1.name }), toSection: .main)
+        snapshot.appendItems(self.models.sorted(by: { $0.name < $1.name }), toSection: .main)
         dataSource.apply(snapshot, animatingDifferences: false)
     }
 
@@ -91,6 +91,16 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        startObserving()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        queueTimer?.invalidate()
+        queueTimer = nil
+        operations.removeAll()
+        operationQueue.cancelAllOperations()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -124,16 +134,16 @@ class ViewController: UIViewController {
     func checkAvalibility() {
         resetRequests()
         
-        for model in Self.models {
+        for model in self.models {
             let request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 this.lock.lock()
-                guard let modelIndex = Self.models.firstIndex(of: model) else {
+                guard let modelIndex = this.models.firstIndex(of: model) else {
                     return
                 }
                 
-                let model = Self.models[modelIndex]
+                let model = this.models[modelIndex]
                 
                 if error != nil {
                     model.avaliable = false
@@ -159,11 +169,11 @@ class ViewController: UIViewController {
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 this.lock.lock()
-                guard let modelIndex = Self.models.firstIndex(of: model) else {
+                guard let modelIndex = this.models.firstIndex(of: model) else {
                     return
                 }
 
-                let model = Self.models[modelIndex]
+                let model = this.models[modelIndex]
 
                 if error != nil {
                     model.avaliable = false
@@ -185,13 +195,107 @@ class ViewController: UIViewController {
         }
     }
     
+    lazy var operationQueue = { () -> OperationQueue in
+        let operationQueue = OperationQueue()
+        operationQueue.maxConcurrentOperationCount = self.maxThreads
+        return operationQueue
+    }()
+    let mapOperationsCount = 100
+    let maxThreads = 10
+    
+    var queueTimer: Timer? {
+        didSet {
+             print("Did set timer")
+        }
+    }
+    var operations: [URLRequest: Operation] = [:]
+    let observingLock = NSRecursiveLock()
+    let syncQueue = DispatchQueue(label: "sync.queue")
+    
+    func startObserving() {
+        
+        var isCancelled = false
+        queueTimer?.invalidate()
+        queueTimer = nil
+        queueTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
+            guard let this = self else { return }
+            guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
+            guard let model = this.models.first(where: \.avaliable) ?? this.local.first(where: \.avaliable) else { return }
+            print("Start actively checking \(model.name)")
+            for i in 0..<this.maxThreads {
+                var previousRequest: Operation?
+                let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
+                var comonents = URLComponents(string: model.url.absoluteString)
+                comonents?.queryItems = [queryComponents]
+                let request = URLRequest(url: comonents!.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
+                for _ in 0..<this.mapOperationsCount {                    
+                    let operation = ObservedStatusOperation(request: request)
+                    operation.onResult = { result in
+                        this.syncQueue.async { [weak self] in
+                            guard let this = self else { return }
+                            
+                            switch result {
+                            case let .failure(error):
+                                if case ObservedStatusOperation.RequestError.cancelled = error {
+                                    if this.operations[request] == nil { return }
+                                    this.updateModelAvailability(model: model, available: true)
+                                    this.operations.removeValue(forKey: request)
+                                    return
+                                }
+                            default:
+                                break
+                            }
+                            
+                            
+                            if (try? result.get()) == nil && isCancelled == false {
+                                isCancelled = true
+                                this.updateModelAvailability(model: model, available: false)
+                                this.operations.removeAll()
+                                this.operationQueue.cancelAllOperations()
+                                this.startObserving()
+                            } else {
+                                if this.operations[request] == nil { return }
+                                this.updateModelAvailability(model: model, available: isCancelled == false)
+                                this.operations.removeValue(forKey: request)
+                            }
+                        }
+                    }
+                    this.operations[request] = operation
+                    
+                    if let previousRequest = previousRequest {
+                        operation.addDependency(previousRequest)
+                    }
+                    this.operationQueue.addOperation(operation)
+                    let blockOperation = BlockOperation {
+                        this.operations.removeValue(forKey: request)
+                    }
+                    
+                    previousRequest = operation
+                }
+            }
+        })
+    }
+    
+    private func updateModelAvailability(model: AvalibilityViewModel, available: Bool) {
+        if let index = models.firstIndex(of: model) {
+            models[index].avaliable = available
+        } else if let index = local.firstIndex(of: model) {
+            models[index].avaliable = available
+        }
+        
+        var newSnapshot = self.dataSource.snapshot()
+        newSnapshot.reloadItems([model])
+        self.dataSource.apply(newSnapshot, animatingDifferences: false)
+        self.reloadCounter()
+    }
+    
     private func reloadCounter() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let countOfAvailiable = (Self.models + self.local)
+            let countOfAvailiable = (self.models + self.local)
                 .filter({ $0.avaliable == true })
                 .count
-            self.availiableSitesLabel.text = String(format: NSLocalizedString("active.websites.number.text", comment: ""), "\(countOfAvailiable)", "\(Self.models.count)")
+            self.availiableSitesLabel.text = String(format: NSLocalizedString("active.websites.number.text", comment: ""), "\(countOfAvailiable)", "\(self.models.count)")
         }
     }
     
