@@ -65,6 +65,12 @@ class ViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    private func updateTable(block: @escaping () -> ()) {
+        DispatchQueue.global().async {
+            block()
+        }
+    }
+    
     private func makeDataSource() -> DataSource {
         let dataSource = DataSource(
             tableView: tableView,
@@ -82,7 +88,7 @@ class ViewController: UIViewController {
     
     func downloadLatestSiteToObserve() {
         donwloadLatestUpdated?.suspend()
-        let timer = RepeatingTimer(timeInterval: 60)
+        let timer = RepeatingTimer(timeInterval: 5)
         timer.eventHandler = { [weak self] in
             self?.downloadLatestSites()
         }
@@ -92,7 +98,8 @@ class ViewController: UIViewController {
     
     private func downloadLatestSites() {
         let url = URL(string: "https://raw.githubusercontent.com/secwow/sitechecker/main/SitesToCheck")
-        URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
+        let request = URLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let data = data,
                   let response = try? JSONDecoder().decode(ControlResponse.self, from: data),
                   let local = self?.models else {
@@ -115,20 +122,26 @@ class ViewController: UIViewController {
             }
             
             let result = (self?.models ?? []) + needToAdd.sorted(by: { response.targetURLs.contains($0.url) && !response.targetURLs.contains($1.url) })
-            var snapshot = Snapshot()
-            snapshot.appendSections([.main])
-            snapshot.appendItems(result, toSection: .main)
-            self?.dataSource.apply(snapshot, animatingDifferences: false)
-            self?.reloadCounter()
+            
+            self?.updateTable {
+                var snapshot = Snapshot()
+                self?.models.append(contentsOf: needToAdd)
+                snapshot.appendSections([.main])
+                snapshot.appendItems(result, toSection: .main)
+                self?.dataSource.apply(snapshot, animatingDifferences: false)
+                self?.reloadCounter()
+            }
+
+            
         }.resume()
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
-        DispatchQueue.global().async { [weak self] in
+        self.updateTable {
             var snapshot = Snapshot()
             snapshot.appendSections([.main])
-            snapshot.appendItems(self?.models ?? [], toSection: .main)
-            self?.dataSource.apply(snapshot, animatingDifferences: false)
+            snapshot.appendItems(self.models ?? [], toSection: .main)
+            self.dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
     
@@ -195,12 +208,15 @@ class ViewController: UIViewController {
             return
         }
         
-        let model = AvalibilityViewModel(name: str, url: URL(string: str)!, available: true)
-        models.append(model)
-        SitesList.localSites.append(model)
-        var newSnapshot = self.dataSource.snapshot()
-        newSnapshot.appendItems([model])
-        dataSource.apply(newSnapshot)
+        self.updateTable {
+            let model = AvalibilityViewModel(name: str, url: URL(string: str)!, available: true)
+            self.models.append(model)
+            SitesList.localSites.append(model)
+            var newSnapshot = self.dataSource.snapshot()
+            newSnapshot.appendItems([model])
+            self.dataSource.apply(newSnapshot)
+        }
+       
         checkAvalibility()
     }
     
@@ -212,7 +228,19 @@ class ViewController: UIViewController {
         resetRequests()
         
         for model in self.models {
-            let request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+
+            
+            guard var host = model.url.host else {
+                continue
+            }
+            
+            
+            if host.contains("http") == false {
+                host = "https://" + host
+            }
+            
+            
+            let request = URLRequest(url: URL(string: host)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 
@@ -237,11 +265,15 @@ class ViewController: UIViewController {
                 guard model.available != isAvailable else { return }
                 model.available = isAvailable
                 
-                var newSnapshot = this.dataSource.snapshot()
-                newSnapshot.reloadItems([model])
-                
-                this.dataSource.apply(newSnapshot, animatingDifferences: false)
-                this.reloadCounter()
+                this.updateTable {
+                    var newSnapshot = this.dataSource.snapshot()
+                    print(model.name)
+                    newSnapshot.reloadItems([model])
+                    
+                    this.dataSource.apply(newSnapshot, animatingDifferences: false)
+                    this.reloadCounter()
+                }
+
             }
             dataTask.resume()
             
@@ -325,9 +357,12 @@ class ViewController: UIViewController {
             models[index].available = available
         }
         
-        var newSnapshot = self.dataSource.snapshot()
-        newSnapshot.reloadItems([model])
-        self.dataSource.apply(newSnapshot, animatingDifferences: false)
+        self.updateTable {
+            var newSnapshot = self.dataSource.snapshot()
+            newSnapshot.reloadItems([model])
+            self.dataSource.apply(newSnapshot, animatingDifferences: false)
+        }
+
         self.reloadCounter()
     }
     
