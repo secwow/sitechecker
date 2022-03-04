@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E857F6D27D16282004E90F5 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E857F6C27D16282004E90F5 /* RepeatingTimer.swift */; };
 		525ED03327CA370000FB9307 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED03227CA370000FB9307 /* AppDelegate.swift */; };
 		525ED03527CA370000FB9307 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED03427CA370000FB9307 /* SceneDelegate.swift */; };
 		525ED03727CA370000FB9307 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525ED03627CA370000FB9307 /* ViewController.swift */; };
@@ -61,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3E857F6C27D16282004E90F5 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
 		525ED02F27CA370000FB9307 /* RussianSiteChecker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RussianSiteChecker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		525ED03227CA370000FB9307 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		525ED03427CA370000FB9307 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				528DD87527CBB407008D8498 /* OnboardingViewController.swift */,
 				528DD87727CBC785008D8498 /* RootComponent.swift */,
 				528DD87927CBC799008D8498 /* Storage.swift */,
+				3E857F6C27D16282004E90F5 /* RepeatingTimer.swift */,
 			);
 			path = RussianSiteChecker;
 			sourceTree = "<group>";
@@ -387,6 +390,7 @@
 				528DD87A27CBC799008D8498 /* Storage.swift in Sources */,
 				525ED06627CA389900FB9307 /* AvalibilityViewModel.swift in Sources */,
 				525ED03727CA370000FB9307 /* ViewController.swift in Sources */,
+				3E857F6D27D16282004E90F5 /* RepeatingTimer.swift in Sources */,
 				5269703927CF7C8400D313FA /* AsyncResultOperation.swift in Sources */,
 				528DD87827CBC785008D8498 /* RootComponent.swift in Sources */,
 				5269703B27CF7CA700D313FA /* ChainedAsyncResultOperation.swift in Sources */,

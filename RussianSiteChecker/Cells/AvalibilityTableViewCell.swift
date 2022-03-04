@@ -7,8 +7,9 @@
 
 import UIKit
 
+private let calendar = Calendar.current
+
 class AvalibilityTableViewCell: UITableViewCell {
-    
     @IBOutlet weak var backgroudView: UIView!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var avalibilityView: UIView!
@@ -33,7 +34,7 @@ class AvalibilityTableViewCell: UITableViewCell {
     func setupWith(model: AvalibilityViewModel) {
         self.nameLabel.text = model.name
         self.url = model.url
-        self.avalibilityView.backgroundColor = model.avaliable ? UIColor.green : UIColor(red: 0.8, green: 0.173, blue: 0.149, alpha: 1)
+        self.avalibilityView.backgroundColor = model.available ? UIColor.green : UIColor(red: 0.8, green: 0.173, blue: 0.149, alpha: 1)
         self.lastUpdateCell.text = NSLocalizedString("less.than.second.ago.text", comment: "")
         date = Date()
         startTimer()
@@ -45,7 +46,6 @@ class AvalibilityTableViewCell: UITableViewCell {
         stopTimer()
         timer = .scheduledTimer(withTimeInterval: 0.5, repeats: true, block: { [weak self] timer in
             guard let self = self else { return }
-            let calendar = Calendar.current
             let components = calendar.dateComponents([.minute, .second], from: self.date, to: Date())
             let second = components.second ?? 0
             

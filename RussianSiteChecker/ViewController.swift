@@ -16,11 +16,11 @@ class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var availiableSitesLabel: UILabel!
     var models = SitesList.sitesWithNames.map({
-        AvalibilityViewModel(name: $0.0, url: $0.1, avaliable: false)})
+        AvalibilityViewModel(name: $0.0, url: $0.1, available: false)})
         .sorted(by: { $0.name < $1.name })
     var local: [AvalibilityViewModel] = SitesList.localSites
         .map({ URL(string: $0)! })
-        .map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, avaliable: false)})
+        .map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, available: false)})
         .sorted(by: { $0.name < $1.name })
     
     enum Section {
@@ -30,7 +30,7 @@ class ViewController: UIViewController {
     
     private lazy var dataSource = makeDataSource()
     private var lock = NSLock()
-    var timer: Timer?
+    private var timer: RepeatingTimer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,7 +58,7 @@ class ViewController: UIViewController {
     }
     
     func downloadLatestSiteToObserve() {
-        let url = URL(string: "ahttps://raw.githubusercontent.com/secwow/sitechecker/main/SitesToCheck")
+        let url = URL(string: "https://raw.githubusercontent.com/secwow/sitechecker/main/SitesToCheck")
         URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
             guard let data = data,
                   let string = String(data: data, encoding: .utf8),
@@ -118,7 +118,7 @@ class ViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        queueTimer?.invalidate()
+        queueTimer?.suspend()
         queueTimer = nil
         operations.removeAll()
         operationQueue.cancelAllOperations()
@@ -126,13 +126,16 @@ class ViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        timer?.invalidate()
-        self.timer = .scheduledTimer(withTimeInterval: 5, repeats: true, block: { [weak self] _ in
+        timer?.suspend()
+        let timer = RepeatingTimer(timeInterval: 5)
+        timer.eventHandler = { [weak self] in
             self?.checkAvalibility()
-        })
+        }
+        timer.resume()
+        self.timer = timer
     }
     
-    var requests: [URLSessionDataTask] = []
+    private var requests: [URLSessionDataTask] = []
 
     func addWebsite(_ str: String) {
         guard str.hasPrefix("https://") || str.hasPrefix("http://")
@@ -147,7 +150,7 @@ class ViewController: UIViewController {
         }
 
         SitesList.localSites.insert(str, at: 0)
-        local.insert(AvalibilityViewModel(name: str, url: URL(string: str)!, avaliable: true), at: 0)
+        local.insert(AvalibilityViewModel(name: str, url: URL(string: str)!, available: true), at: 0)
         applySnapshot()
         checkAvalibility()
     }
@@ -160,25 +163,29 @@ class ViewController: UIViewController {
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 this.lock.lock()
+                defer {
+                    this.lock.unlock()
+                }
                 guard let modelIndex = this.models.firstIndex(of: model) else {
                     return
                 }
                 
                 let model = this.models[modelIndex]
-                
+                let isAvailable: Bool
                 if error != nil {
-                    model.avaliable = false
+                    isAvailable = false
                 } else if let response = response as? HTTPURLResponse, 400..<599 ~= response.statusCode {
-                    model.avaliable = false
+                    isAvailable = false
                 } else {
-                    model.avaliable = true
+                    isAvailable = true
                 }
-                
+                guard model.available != isAvailable else { return }
+                model.available = isAvailable
+
                 var newSnapshot = this.dataSource.snapshot()
                 newSnapshot.reloadItems([model])
                 this.dataSource.apply(newSnapshot, animatingDifferences: false)
                 this.reloadCounter()
-                this.lock.unlock()
             }
             dataTask.resume()
             
@@ -190,25 +197,30 @@ class ViewController: UIViewController {
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
                 this.lock.lock()
+                defer {
+                    this.lock.unlock()
+                }
                 guard let modelIndex = this.models.firstIndex(of: model) else {
                     return
                 }
 
                 let model = this.models[modelIndex]
-
+                let isAvailable: Bool
                 if error != nil {
-                    model.avaliable = false
+                    isAvailable = false
                 } else if let response = response as? HTTPURLResponse, 400..<599 ~= response.statusCode {
-                    model.avaliable = false
+                    isAvailable = false
                 } else {
-                    model.avaliable = true
+                    isAvailable = true
                 }
+
+                guard model.available != isAvailable else { return }
+                model.available = isAvailable
 
                 var newSnapshot = this.dataSource.snapshot()
                 newSnapshot.reloadItems([model])
                 this.dataSource.apply(newSnapshot, animatingDifferences: false)
                 this.reloadCounter()
-                this.lock.unlock()
             }
             dataTask.resume()
 
@@ -224,7 +236,7 @@ class ViewController: UIViewController {
     let mapOperationsCount = 100
     let maxThreads = 10
     
-    var queueTimer: Timer? {
+    var queueTimer: RepeatingTimer? {
         didSet {
              print("Did set timer")
         }
@@ -234,10 +246,12 @@ class ViewController: UIViewController {
     let syncQueue = DispatchQueue(label: "sync.queue")
     
     func startObserving() {
-        queueTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] _ in
+        reloadCounter()
+        let timer = RepeatingTimer(timeInterval: 0.1)
+        timer.eventHandler = { [weak self] in
             guard let this = self else { return }
             guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
-            guard let model = this.models.first(where: \.avaliable) ?? this.local.first(where: \.avaliable) else { return }
+            guard let model = this.models.first(where: \.available) ?? this.local.first(where: \.available) else { return }
             print("Start actively checking \(model.name)")
             for _ in 0..<this.maxThreads {
                 var previousRequest: Operation?
@@ -289,14 +303,17 @@ class ViewController: UIViewController {
                     previousRequest = operation
                 }
             }
-        })
+        }
+        
+        queueTimer = timer
+        timer.resume()
     }
     
     private func updateModelAvailability(model: AvalibilityViewModel, available: Bool) {
         if let index = models.firstIndex(of: model) {
-            models[index].avaliable = available
+            models[index].available = available
         } else if let index = local.firstIndex(of: model) {
-            models[index].avaliable = available
+            models[index].available = available
         }
         
         var newSnapshot = self.dataSource.snapshot()
@@ -309,7 +326,7 @@ class ViewController: UIViewController {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let countOfAvailiable = (self.models + self.local)
-                .filter({ $0.avaliable == true })
+                .filter({ $0.available == true })
                 .count
             self.availiableSitesLabel.text = String(format: NSLocalizedString("active.websites.number.text", comment: ""), "\(countOfAvailiable)", "\(self.models.count)")
         }
@@ -332,7 +349,7 @@ extension ViewController: UITableViewDelegate {
         
         let vc = UIStoryboard(name: "Main", bundle: .main).instantiateViewController(withIdentifier: "observeVC") as! ObservingViewController
         vc.model = (model.name, model.url)
-        vc.avalibility = model.avaliable
+        vc.avalibility = model.available
         navigationController?.pushViewController(vc, animated: false)
         tableView.deselectRow(at: indexPath, animated: false)
     }

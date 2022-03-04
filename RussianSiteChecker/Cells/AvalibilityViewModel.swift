@@ -8,16 +8,16 @@
 import Foundation
 
 class AvalibilityViewModel: Hashable {
-    internal init(name: String, url: URL, avaliable: Bool) {
+    init(name: String, url: URL, available: Bool) {
         self.name = name
         self.url = url
-        self.avaliable = avaliable
+        self.available = available
     }
-    
-    var name: String
-    var url: URL
-    var avaliable: Bool
-    
+
+    let name: String
+    let url: URL
+    var available: Bool
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(url)
     }
