@@ -60,6 +60,7 @@ class ViewController: UIViewController {
         checkAvalibility()
         downloadLatestSiteToObserve()
         titleTextLabel.text = NSLocalizedString("website.list.text", comment: "")
+        downloadLatestSites()
         let tap = UITapGestureRecognizer(target: self, action: #selector(showStatistics))
         tap.numberOfTouchesRequired = 5
         view.addGestureRecognizer(tap)
@@ -88,7 +89,7 @@ class ViewController: UIViewController {
     
     func downloadLatestSiteToObserve() {
         donwloadLatestUpdated?.suspend()
-        let timer = RepeatingTimer(timeInterval: 5)
+        let timer = RepeatingTimer(timeInterval: 60)
         timer.eventHandler = { [weak self] in
             self?.downloadLatestSites()
         }
