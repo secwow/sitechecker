@@ -10,6 +10,8 @@ import Foundation
 class Storage {
     static let shared = Storage()
     private let onboardingKey = "onboarding"
+    private let firstLaunchKey = "firstKey"
+
     
     private init() {}
     
@@ -19,6 +21,15 @@ class Storage {
     }
     
     var isOnboardingPassed: Bool {
-        return UserDefaults.standard.bool(forKey: onboardingKey) ?? false
+        return UserDefaults.standard.bool(forKey: onboardingKey)
+    }
+    
+    var isFirstLaunch: Bool {
+        return UserDefaults.standard.bool(forKey: firstLaunchKey) == false
+    }
+    
+    func firstLaunchOccured() {
+        UserDefaults.standard.set(true, forKey: firstLaunchKey)
+        UserDefaults.standard.synchronize()
     }
 }
