@@ -393,7 +393,9 @@ class ViewController: UIViewController {
             return request
         }
         
-        var URLString = model.url.absoluteString.replacingOccurrences(of: "%@", with: UUID().uuidString)
+        var URLString = model.url.absoluteString.replacingOccurrences(of: "%25@", with: UUID().uuidString)
+        URLString = URLString.replacingOccurrences(of: "%@", with: UUID().uuidString)
+
         if URLString == model.url.absoluteString {
             let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
             var comonents = URLComponents(string: model.url.absoluteString)
