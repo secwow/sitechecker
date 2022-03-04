@@ -68,21 +68,28 @@ enum SitesList {
         return (name, URL(string: url)!)
     }
     @UserDefault(key: "local_sites", defaultValue: [])
-    static var localSites: [String]
+    static var localSites: [AvalibilityViewModel]
 }
 
 @propertyWrapper
-struct UserDefault<Value> {
+struct UserDefault<Value: Codable> {
     let key: String
     let defaultValue: Value
     var container: UserDefaults = .standard
 
     var wrappedValue: Value {
         get {
-            return container.object(forKey: key) as? Value ?? defaultValue
+            guard let data = container.data(forKey: key) else {
+                return defaultValue
+            }
+            let model = try? JSONDecoder().decode(Value.self, from: data)
+            return model ?? defaultValue
         }
         set {
-            container.set(newValue, forKey: key)
+            guard let model = try? JSONEncoder().encode(newValue) else {
+                return
+            }
+            container.set(model, forKey: key)
         }
     }
 }

@@ -25,6 +25,7 @@
 		5269703727CF7C3200D313FA /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5269703627CF7C3200D313FA /* AsyncOperation.swift */; };
 		5269703927CF7C8400D313FA /* AsyncResultOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5269703827CF7C8400D313FA /* AsyncResultOperation.swift */; };
 		5269703B27CF7CA700D313FA /* ChainedAsyncResultOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5269703A27CF7CA700D313FA /* ChainedAsyncResultOperation.swift */; };
+		5269703E27D21B0900D313FA /* SynchronizedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5269703D27D21B0900D313FA /* SynchronizedArray.swift */; };
 		528DD86927CBAE11008D8498 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 528DD85D27CBAE11008D8498 /* OpenSans-SemiBold.ttf */; };
 		528DD86A27CBAE11008D8498 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 528DD85E27CBAE11008D8498 /* OpenSans-BoldItalic.ttf */; };
 		528DD86B27CBAE11008D8498 /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 528DD85F27CBAE11008D8498 /* OpenSans-Light.ttf */; };
@@ -84,6 +85,7 @@
 		5269703627CF7C3200D313FA /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		5269703827CF7C8400D313FA /* AsyncResultOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncResultOperation.swift; sourceTree = "<group>"; };
 		5269703A27CF7CA700D313FA /* ChainedAsyncResultOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChainedAsyncResultOperation.swift; sourceTree = "<group>"; };
+		5269703D27D21B0900D313FA /* SynchronizedArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynchronizedArray.swift; sourceTree = "<group>"; };
 		528DD85D27CBAE11008D8498 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		528DD85E27CBAE11008D8498 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		528DD85F27CBAE11008D8498 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Light.ttf"; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 		525ED03127CA370000FB9307 /* RussianSiteChecker */ = {
 			isa = PBXGroup;
 			children = (
+				5269703C27D21B0300D313FA /* Utils */,
 				5269703527CF7C0200D313FA /* Operations */,
 				528DD85B27CBADF7008D8498 /* Resources */,
 				525ED06427CA387F00FB9307 /* Cells */,
@@ -210,6 +213,14 @@
 				5269703A27CF7CA700D313FA /* ChainedAsyncResultOperation.swift */,
 			);
 			path = Operations;
+			sourceTree = "<group>";
+		};
+		5269703C27D21B0300D313FA /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				5269703D27D21B0900D313FA /* SynchronizedArray.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		528DD85B27CBADF7008D8498 /* Resources */ = {
@@ -391,6 +402,7 @@
 				525ED06627CA389900FB9307 /* AvalibilityViewModel.swift in Sources */,
 				525ED03727CA370000FB9307 /* ViewController.swift in Sources */,
 				3E857F6D27D16282004E90F5 /* RepeatingTimer.swift in Sources */,
+				5269703E27D21B0900D313FA /* SynchronizedArray.swift in Sources */,
 				5269703927CF7C8400D313FA /* AsyncResultOperation.swift in Sources */,
 				528DD87827CBC785008D8498 /* RootComponent.swift in Sources */,
 				5269703B27CF7CA700D313FA /* ChainedAsyncResultOperation.swift in Sources */,

@@ -7,15 +7,17 @@
 
 import Foundation
 
-class AvalibilityViewModel: Hashable {
-    init(name: String, url: URL, available: Bool) {
+class AvalibilityViewModel: Hashable, Codable {
+    init(name: String, url: URL, available: Bool, method: String? = nil) {
         self.name = name
         self.url = url
         self.available = available
+        self.method = method
     }
 
     let name: String
     let url: URL
+    let method: String?
     var available: Bool
 
     func hash(into hasher: inout Hasher) {

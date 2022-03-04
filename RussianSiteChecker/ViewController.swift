@@ -8,29 +8,37 @@
 import UIKit
 
 class ViewController: UIViewController {
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
-    typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
+    private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
+    private typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
 
     @IBOutlet weak var titleTextLabel: UILabel!
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var availiableSitesLabel: UILabel!
-    var models = SitesList.sitesWithNames.map({
-        AvalibilityViewModel(name: $0.0, url: $0.1, available: false)})
-        .sorted(by: { $0.name < $1.name })
-    var local: [AvalibilityViewModel] = SitesList.localSites
-        .map({ URL(string: $0)! })
-        .map({ AvalibilityViewModel.init(name: $0.absoluteString, url: $0, available: false)})
-        .sorted(by: { $0.name < $1.name })
-    
-    enum Section {
-        case local
-        case main
-    }
     
     private lazy var dataSource = makeDataSource()
     private var lock = NSLock()
     private var timer: RepeatingTimer?
+    private var models: [AvalibilityViewModel] =
+        (SitesList.sitesWithNames.map({
+            AvalibilityViewModel(name: $0.0, url: $0.1, available: false) } ) +
+        SitesList.localSites)
+            .sorted(by: { $0.name < $1.name })
+
+    
+    private lazy var operationQueue = { () -> OperationQueue in
+        let operationQueue = OperationQueue()
+        operationQueue.maxConcurrentOperationCount = self.maxThreads
+        return operationQueue
+    }()
+    private let mapOperationsCount = 100
+    private let maxThreads = 10
+    private var queueTimer: RepeatingTimer?
+    private let operations = SynchronizedArray<Operation>()
+    
+    enum Section {
+        case main
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +52,7 @@ class ViewController: UIViewController {
         titleTextLabel.text = NSLocalizedString("website.list.text", comment: "")
     }
     
-    func makeDataSource() -> DataSource {
+    private func makeDataSource() -> DataSource {
         let dataSource = DataSource(
             tableView: tableView,
             cellProvider: { (tableView, indexPath, model) ->
@@ -62,7 +70,7 @@ class ViewController: UIViewController {
         URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
             guard let data = data,
                   let string = String(data: data, encoding: .utf8),
-                  let local = self?.local else {
+                  let local = self?.models else {
                 return
             }
             
@@ -71,8 +79,17 @@ class ViewController: UIViewController {
                       local.contains(where: { $0.url  == url }) == false else {
                     continue
                 }
-                
-                SitesList.localSites.insert(String(site), at: 0)
+                let model = AvalibilityViewModel(name: url.absoluteString, url: url, available: false)
+               
+                guard var snapshot = self?.dataSource.snapshot() else {
+                    return
+                }
+                self?.models.append(model)
+                SitesList.localSites.append(model)
+                snapshot.appendItems([model], toSection: .main)
+
+                self?.dataSource.apply(snapshot, animatingDifferences: false)
+                self?.reloadCounter()
             }
             
         }.resume()
@@ -80,9 +97,11 @@ class ViewController: UIViewController {
     
     func applySnapshot(animatingDifferences: Bool = true) {
         var snapshot = Snapshot()
-        snapshot.appendSections([.local, .main])
-        snapshot.appendItems(local, toSection: .local)
-        snapshot.appendItems(self.models.sorted(by: { $0.name < $1.name }), toSection: .main)
+        snapshot.appendSections([.main])
+        for model in models {
+            print(model.name)
+        }
+        snapshot.appendItems(self.models, toSection: .main)
         dataSource.apply(snapshot, animatingDifferences: false)
     }
 
@@ -149,8 +168,9 @@ class ViewController: UIViewController {
             return
         }
 
-        SitesList.localSites.insert(str, at: 0)
-        local.insert(AvalibilityViewModel(name: str, url: URL(string: str)!, available: true), at: 0)
+        let model = AvalibilityViewModel(name: str, url: URL(string: str)!, available: true)
+        models.append(model)
+        SitesList.localSites.append(model)
         applySnapshot()
         checkAvalibility()
     }
@@ -184,6 +204,7 @@ class ViewController: UIViewController {
 
                 var newSnapshot = this.dataSource.snapshot()
                 newSnapshot.reloadItems([model])
+
                 this.dataSource.apply(newSnapshot, animatingDifferences: false)
                 this.reloadCounter()
             }
@@ -191,59 +212,7 @@ class ViewController: UIViewController {
             
             requests.append(dataTask)
         }
-
-        for model in local {
-            let request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-            let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
-                guard let this = self else { return }
-                this.lock.lock()
-                defer {
-                    this.lock.unlock()
-                }
-                guard let modelIndex = this.models.firstIndex(of: model) else {
-                    return
-                }
-
-                let model = this.models[modelIndex]
-                let isAvailable: Bool
-                if error != nil {
-                    isAvailable = false
-                } else if let response = response as? HTTPURLResponse, 400..<599 ~= response.statusCode {
-                    isAvailable = false
-                } else {
-                    isAvailable = true
-                }
-
-                guard model.available != isAvailable else { return }
-                model.available = isAvailable
-
-                var newSnapshot = this.dataSource.snapshot()
-                newSnapshot.reloadItems([model])
-                this.dataSource.apply(newSnapshot, animatingDifferences: false)
-                this.reloadCounter()
-            }
-            dataTask.resume()
-
-            requests.append(dataTask)
-        }
     }
-    
-    lazy var operationQueue = { () -> OperationQueue in
-        let operationQueue = OperationQueue()
-        operationQueue.maxConcurrentOperationCount = self.maxThreads
-        return operationQueue
-    }()
-    let mapOperationsCount = 100
-    let maxThreads = 10
-    
-    var queueTimer: RepeatingTimer? {
-        didSet {
-             print("Did set timer")
-        }
-    }
-    var operations: [Operation] = []
-    let observingLock = NSRecursiveLock()
-    let syncQueue = DispatchQueue(label: "sync.queue")
     
     func startObserving() {
         reloadCounter()
@@ -251,38 +220,35 @@ class ViewController: UIViewController {
         timer.eventHandler = { [weak self] in
             guard let this = self else { return }
             guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
-            guard let model = this.models.first(where: \.available) ?? this.local.first(where: \.available) else { return }
+            guard let model = this.models.first(where: \.available) else { return }
             print("Start actively checking \(model.name)")
             for _ in 0..<this.maxThreads {
                 var previousRequest: Operation?
-                let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
-                var comonents = URLComponents(string: model.url.absoluteString)
-                comonents?.queryItems = [queryComponents]
-                let request = URLRequest(url: comonents!.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
-                for _ in 0..<this.mapOperationsCount {                    
+                
+                let request = this.createRequest(model: model)
+                
+                for _ in 0..<this.mapOperationsCount {
                     let operation = ObservedStatusOperation(request: request)
                     operation.onResult = { result in
-                        this.syncQueue.async { [weak self] in
-                            guard let this = self else { return }
-                            
-                            switch result {
-                            case let .failure(error):
-                                if case ObservedStatusOperation.RequestError.cancelled = error {
-                                    this.updateModelAvailability(model: model, available: true)
-                                    return
-                                }
-                            default:
-                                break
-                            }
-                            
-                            
-                            if (try? result.get()) == nil {
-                                this.updateModelAvailability(model: model, available: false)
-                                this.operations.removeAll()
-                                this.operationQueue.cancelAllOperations()
-                            } else {
+                        guard let this = self else { return }
+                        
+                        switch result {
+                        case let .failure(error):
+                            if case ObservedStatusOperation.RequestError.cancelled = error {
                                 this.updateModelAvailability(model: model, available: true)
+                                return
                             }
+                        default:
+                            break
+                        }
+                        
+                        
+                        if (try? result.get()) == nil {
+                            this.updateModelAvailability(model: model, available: false)
+                            this.operations.removeAll()
+                            this.operationQueue.cancelAllOperations()
+                        } else {
+                            this.updateModelAvailability(model: model, available: true)
                         }
                     }
                     this.operations.append(operation)
@@ -291,15 +257,14 @@ class ViewController: UIViewController {
                         operation.addDependency(previousRequest)
                     }
                     let blockOperation = BlockOperation { [weak this] in
-                        _ = this?.syncQueue.sync {
-                            this?.operations.firstIndex(of: operation).flatMap { this?.operations.remove(at: $0) }
-                        }
+                            this?.operations.firstIndex(where: { $0 == operation})
+                                .flatMap { this?.operations.remove(at: $0) }
                     }
                     blockOperation.addDependency(operation)
-
+                    
                     this.operationQueue.addOperation(operation)
                     this.operationQueue.addOperation(blockOperation)
-
+                    
                     previousRequest = operation
                 }
             }
@@ -312,8 +277,6 @@ class ViewController: UIViewController {
     private func updateModelAvailability(model: AvalibilityViewModel, available: Bool) {
         if let index = models.firstIndex(of: model) {
             models[index].available = available
-        } else if let index = local.firstIndex(of: model) {
-            models[index].available = available
         }
         
         var newSnapshot = self.dataSource.snapshot()
@@ -325,7 +288,7 @@ class ViewController: UIViewController {
     private func reloadCounter() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let countOfAvailiable = (self.models + self.local)
+            let countOfAvailiable = self.models
                 .filter({ $0.available == true })
                 .count
             self.availiableSitesLabel.text = String(format: NSLocalizedString("active.websites.number.text", comment: ""), "\(countOfAvailiable)", "\(self.models.count)")
@@ -338,6 +301,30 @@ class ViewController: UIViewController {
         }
         
         self.requests = []
+    }
+    
+    private func createRequest(model: AvalibilityViewModel, initialDefinition: Bool = true) -> URLRequest {
+        guard model.method == nil else {
+            let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
+            var comonents = URLComponents(string: model.url.absoluteString)
+            comonents?.queryItems = [queryComponents]
+            let request = URLRequest(url: comonents!.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+            return request
+        }
+        
+        var URLString = model.url.absoluteString.replacingOccurrences(of: "%@", with: UUID().uuidString)
+        if URLString == model.url.absoluteString {
+            let queryComponents = URLQueryItem(name: UUID().uuidString, value: UUID().uuidString)
+            var comonents = URLComponents(string: model.url.absoluteString)
+            comonents?.queryItems = [queryComponents]
+            URLString = (comonents?.url!.absoluteString)!
+        }
+        
+        var request = URLRequest(url: URL(string: URLString)!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        request.httpMethod = model.method ?? "GET"
+        
+        
+        return request
     }
 }
 
