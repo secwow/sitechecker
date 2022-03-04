@@ -9,8 +9,8 @@ import Foundation
 
 enum SitesList {
     static let sitesWithNames: [(String, URL)] = [
-        ("Cбербанк", "https://www.sberbank.ru"),
-        ("Банк ВТБ", "https://www.vtb.ru/")
+//        ("Cбербанк", "https://www.sberbank.ru"),
+//        ("Банк ВТБ", "https://www.vtb.ru/")
     ].map { (name, url) -> (String, URL) in
         return (name, URL(string: url)!)
     }

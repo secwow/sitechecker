@@ -107,7 +107,8 @@ class ViewController: UIViewController {
                   }
             var needToAdd = [AvalibilityViewModel]()
             self?.targetURLs = response.targetURLs
-
+            
+            SitesList.localSites.removeAll()
             for model in response.models {
                 guard local.contains(where: { $0.url == model.url }) == false else {
                     continue
@@ -127,6 +128,7 @@ class ViewController: UIViewController {
                 var snapshot = Snapshot()
                 self?.models.append(contentsOf: needToAdd)
                 snapshot.appendSections([.main])
+                snapshot.deleteItems(local)
                 snapshot.appendItems(result, toSection: .main)
                 self?.dataSource.apply(snapshot, animatingDifferences: false)
                 self?.reloadCounter()
@@ -140,7 +142,7 @@ class ViewController: UIViewController {
         self.updateTable {
             var snapshot = Snapshot()
             snapshot.appendSections([.main])
-            snapshot.appendItems(self.models ?? [], toSection: .main)
+            snapshot.appendItems(self.models, toSection: .main)
             self.dataSource.apply(snapshot, animatingDifferences: false)
         }
     }
