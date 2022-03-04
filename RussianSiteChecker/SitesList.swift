@@ -69,6 +69,9 @@ enum SitesList {
     }
     @UserDefault(key: "local_sites", defaultValue: [])
     static var localSites: [AvalibilityViewModel]
+    
+    @UserDefault(key: "target", defaultValue: [])
+    static var target: [URL]
 }
 
 @propertyWrapper

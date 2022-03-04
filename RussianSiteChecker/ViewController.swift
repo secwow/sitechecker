@@ -7,10 +7,15 @@
 
 import UIKit
 
+struct ControlResponse: Codable {
+    let models: [AvalibilityViewModel]
+    let targetURLs: [URL]
+}
+
 class ViewController: UIViewController {
     private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
     private typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
-
+    
     @IBOutlet weak var titleTextLabel: UILabel!
     @IBOutlet weak var addButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
@@ -20,11 +25,12 @@ class ViewController: UIViewController {
     private var lock = NSLock()
     private var timer: RepeatingTimer?
     private var models: [AvalibilityViewModel] =
-        (SitesList.sitesWithNames.map({
-            AvalibilityViewModel(name: $0.0, url: $0.1, available: false) } ) +
-        SitesList.localSites)
-            .sorted(by: { $0.name < $1.name })
-
+    (SitesList.sitesWithNames.map({
+        AvalibilityViewModel(name: $0.0, url: $0.1, available: false) } ) +
+     SitesList.localSites)
+        .sorted(by: { $0.name < $1.name })
+    private var targetURLs: [URL] = SitesList.target
+    
     
     private lazy var operationQueue = { () -> OperationQueue in
         let operationQueue = OperationQueue()
@@ -34,7 +40,10 @@ class ViewController: UIViewController {
     private let mapOperationsCount = 100
     private let maxThreads = 10
     private var queueTimer: RepeatingTimer?
+    private var donwloadLatestUpdated: RepeatingTimer?
     private let operations = SynchronizedArray<Operation>()
+    private var selectedIndexPath: IndexPath?
+
     
     enum Section {
         case main
@@ -55,10 +64,11 @@ class ViewController: UIViewController {
     private func makeDataSource() -> DataSource {
         let dataSource = DataSource(
             tableView: tableView,
-            cellProvider: { (tableView, indexPath, model) ->
+            cellProvider: { [weak self] (tableView, indexPath, model) ->
                 UITableViewCell? in
                 let cell = tableView.dequeueReusableCell(withIdentifier: "avalibilityCell", for: indexPath) as! AvalibilityTableViewCell
                 cell.selectionStyle = .none
+                cell.accessoryType = indexPath == self?.selectedIndexPath ? .checkmark : .none
                 cell.setupWith(model: model)
                 return cell
             })
@@ -66,46 +76,56 @@ class ViewController: UIViewController {
     }
     
     func downloadLatestSiteToObserve() {
+        timer?.suspend()
+        let timer = RepeatingTimer(timeInterval: 60)
+        timer.eventHandler = { [weak self] in
+            self?.downloadLatestSites()
+        }
+        timer.resume()
+        self.timer = timer
+    }
+    
+    private func downloadLatestSites() {
         let url = URL(string: "https://raw.githubusercontent.com/secwow/sitechecker/main/SitesToCheck")
         URLSession.shared.dataTask(with: url!) { [weak self] data, response, error in
             guard let data = data,
-                  let string = String(data: data, encoding: .utf8),
+                  let response = try? JSONDecoder().decode(ControlResponse.self, from: data),
                   let local = self?.models else {
+                      return
+                  }
+            var needToAdd = [AvalibilityViewModel]()
+            self?.targetURLs = response.targetURLs
+
+            for model in response.models {
+                guard local.contains(where: { $0.url == model.url }) == false else {
+                    continue
+                }
+                
+                needToAdd.append(model)
+                SitesList.localSites.append(model)
+            }
+            
+            guard needToAdd.isEmpty == false else {
                 return
             }
             
-            for site in string.split(separator: "\n") {
-                guard let url = URL(string: String(site)),
-                      local.contains(where: { $0.url  == url }) == false else {
-                    continue
-                }
-                let model = AvalibilityViewModel(name: url.absoluteString, url: url, available: false)
-               
-                guard var snapshot = self?.dataSource.snapshot() else {
-                    return
-                }
-                self?.models.append(model)
-                SitesList.localSites.append(model)
-                snapshot.appendItems([model], toSection: .main)
-
-                self?.dataSource.apply(snapshot, animatingDifferences: false)
-                self?.reloadCounter()
-            }
-            
+            let result = (self?.models ?? []) + needToAdd.sorted(by: { response.targetURLs.contains($0.url) && !response.targetURLs.contains($1.url) })
+            var snapshot = Snapshot()
+            snapshot.appendSections([.main])
+            snapshot.appendItems(result, toSection: .main)
+            self?.dataSource.apply(snapshot, animatingDifferences: false)
+            self?.reloadCounter()
         }.resume()
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
-        for model in models {
-            print(model.name)
-        }
         snapshot.appendItems(self.models, toSection: .main)
         dataSource.apply(snapshot, animatingDifferences: false)
     }
-
-
+    
+    
     @IBAction func addButtonTouched(_ sender: Any) {
         let alert = UIAlertController(title: NSLocalizedString("add.website.title", comment: ""),
                                       message: NSLocalizedString("add.website.message", comment: ""),
@@ -113,7 +133,7 @@ class ViewController: UIViewController {
         alert.addTextField { textField in
             textField.placeholder = "rkn.gov.ru"
         }
-
+        
         let addAction = UIAlertAction(title: NSLocalizedString("add.website.add.button", comment: ""),
                                       style: .default) { [weak self]_ in
             guard let textField = alert.textFields?.first else { return }
@@ -121,13 +141,13 @@ class ViewController: UIViewController {
         }
         let cancelAction = UIAlertAction(title: NSLocalizedString("add.website.add.cancel", comment: ""),
                                          style: .cancel, handler: nil)
-
+        
         alert.addAction(addAction)
         alert.addAction(cancelAction)
-
+        
         present(alert, animated: true)
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -155,7 +175,7 @@ class ViewController: UIViewController {
     }
     
     private var requests: [URLSessionDataTask] = []
-
+    
     func addWebsite(_ str: String) {
         guard str.hasPrefix("https://") || str.hasPrefix("http://")
                 && (str.hasSuffix(".ru") || str.hasSuffix(".ru/"))
@@ -167,7 +187,7 @@ class ViewController: UIViewController {
             present(alert, animated: true)
             return
         }
-
+        
         let model = AvalibilityViewModel(name: str, url: URL(string: str)!, available: true)
         models.append(model)
         SitesList.localSites.append(model)
@@ -201,10 +221,10 @@ class ViewController: UIViewController {
                 }
                 guard model.available != isAvailable else { return }
                 model.available = isAvailable
-
+                
                 var newSnapshot = this.dataSource.snapshot()
                 newSnapshot.reloadItems([model])
-
+                
                 this.dataSource.apply(newSnapshot, animatingDifferences: false)
                 this.reloadCounter()
             }
@@ -220,7 +240,17 @@ class ViewController: UIViewController {
         timer.eventHandler = { [weak self] in
             guard let this = self else { return }
             guard this.operations.count < this.maxThreads * this.mapOperationsCount else { return }
-            guard let model = this.models.first(where: \.available) else { return }
+            guard let model = (
+                this.models.filter({ this.targetURLs.contains($0.url) }).first(where: \.available) ??
+                this.models.first(where: \.available))
+            else {
+                return
+            }
+            
+            if let indexPath = this.dataSource.indexPath(for: model) {
+                this.selectedIndexPath = indexPath
+            }
+            
             print("Start actively checking \(model.name)")
             for _ in 0..<this.maxThreads {
                 var previousRequest: Operation?
@@ -235,7 +265,7 @@ class ViewController: UIViewController {
                         switch result {
                         case let .failure(error):
                             if case ObservedStatusOperation.RequestError.cancelled = error {
-                                this.updateModelAvailability(model: model, available: true)
+                                this.updateModelAvailability(model: model, available: false)
                                 return
                             }
                         default:
@@ -257,8 +287,8 @@ class ViewController: UIViewController {
                         operation.addDependency(previousRequest)
                     }
                     let blockOperation = BlockOperation { [weak this] in
-                            this?.operations.firstIndex(where: { $0 == operation})
-                                .flatMap { this?.operations.remove(at: $0) }
+                        this?.operations.firstIndex(where: { $0 == operation})
+                            .flatMap { this?.operations.remove(at: $0) }
                     }
                     blockOperation.addDependency(operation)
                     
