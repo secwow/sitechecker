@@ -75,14 +75,15 @@ class ViewController: UIViewController {
         return dataSource
     }
     
+    
     func downloadLatestSiteToObserve() {
-        timer?.suspend()
+        donwloadLatestUpdated?.suspend()
         let timer = RepeatingTimer(timeInterval: 60)
         timer.eventHandler = { [weak self] in
             self?.downloadLatestSites()
         }
         timer.resume()
-        self.timer = timer
+        self.donwloadLatestUpdated = timer
     }
     
     private func downloadLatestSites() {
