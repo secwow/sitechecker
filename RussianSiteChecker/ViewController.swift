@@ -109,14 +109,12 @@ class ViewController: UIViewController {
             var needToAdd = [AvalibilityViewModel]()
             self?.targetURLs = response.targetURLs
             
-            SitesList.localSites.removeAll()
             for model in response.models {
                 guard local.contains(where: { $0.url == model.url }) == false else {
                     continue
                 }
                 
                 needToAdd.append(model)
-                SitesList.localSites.append(model)
             }
             
             guard needToAdd.isEmpty == false else {
