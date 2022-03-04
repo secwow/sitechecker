@@ -30,6 +30,7 @@ class ViewController: UIViewController {
      SitesList.localSites)
         .sorted(by: { $0.name < $1.name })
     private var targetURLs: [URL] = SitesList.target
+    private var statistics = ThreadSafeDictionary<URL, Int>()
     
     
     private lazy var operationQueue = { () -> OperationQueue in
@@ -59,6 +60,9 @@ class ViewController: UIViewController {
         checkAvalibility()
         downloadLatestSiteToObserve()
         titleTextLabel.text = NSLocalizedString("website.list.text", comment: "")
+        let tap = UITapGestureRecognizer(target: self, action: #selector(showStatistics))
+        tap.numberOfTouchesRequired = 5
+        view.addGestureRecognizer(tap)
     }
     
     private func makeDataSource() -> DataSource {
@@ -120,10 +124,12 @@ class ViewController: UIViewController {
     }
     
     func applySnapshot(animatingDifferences: Bool = true) {
-        var snapshot = Snapshot()
-        snapshot.appendSections([.main])
-        snapshot.appendItems(self.models, toSection: .main)
-        dataSource.apply(snapshot, animatingDifferences: false)
+        DispatchQueue.global().async { [weak self] in
+            var snapshot = Snapshot()
+            snapshot.appendSections([.main])
+            snapshot.appendItems(self?.models ?? [], toSection: .main)
+            self?.dataSource.apply(snapshot, animatingDifferences: false)
+        }
     }
     
     
@@ -192,8 +198,14 @@ class ViewController: UIViewController {
         let model = AvalibilityViewModel(name: str, url: URL(string: str)!, available: true)
         models.append(model)
         SitesList.localSites.append(model)
-        applySnapshot()
+        var newSnapshot = self.dataSource.snapshot()
+        newSnapshot.appendItems([model])
+        dataSource.apply(newSnapshot)
         checkAvalibility()
+    }
+    
+    private func addToStatistic(_ url: URL) {
+        self.statistics[url] = (self.statistics[url] ?? 0) + 1
     }
     
     func checkAvalibility() {
@@ -203,6 +215,8 @@ class ViewController: UIViewController {
             let request = URLRequest(url: model.url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
             let dataTask = URLSession.session.dataTask(with: request) { [weak self] data, response, error in
                 guard let this = self else { return }
+                
+                self?.addToStatistic(model.url)
                 this.lock.lock()
                 defer {
                     this.lock.unlock()
@@ -257,6 +271,7 @@ class ViewController: UIViewController {
                 var previousRequest: Operation?
                 
                 let request = this.createRequest(model: model)
+                self?.addToStatistic(model.url)
                 
                 for _ in 0..<this.mapOperationsCount {
                     let operation = ObservedStatusOperation(request: request)
@@ -356,6 +371,13 @@ class ViewController: UIViewController {
         
         
         return request
+    }
+    
+    @objc
+    private func showStatistics() {
+        let vc = StatisticsViewController()
+        vc.statistics = self.statistics.map({ ($0.key, $0.value) })
+        present(vc, animated: true, completion: nil)
     }
 }
 
