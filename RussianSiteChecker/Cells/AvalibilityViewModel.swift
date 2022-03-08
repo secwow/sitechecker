@@ -28,3 +28,5 @@ class AvalibilityViewModel: Hashable, Codable {
         return lhs.url == rhs.url
     }
 }
+
+

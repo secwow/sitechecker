@@ -12,6 +12,16 @@ struct ControlResponse: Codable {
     let targetURLs: [URL]
 }
 
+
+struct AWSItems: Codable {
+    let destination: String
+    let port: Int?
+}
+
+struct AWSControlResponse: Codable {
+    let models: [AWSItems]
+}
+
 class ViewController: UIViewController {
     private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, AvalibilityViewModel>
     private typealias DataSource = UITableViewDiffableDataSource<Section, AvalibilityViewModel>
@@ -122,6 +132,44 @@ class ViewController: UIViewController {
             }
             
             let result = (self?.models ?? []) + needToAdd.sorted(by: { response.targetURLs.contains($0.url) && !response.targetURLs.contains($1.url) })
+            
+            self?.updateTable {
+                var snapshot = Snapshot()
+                self?.models.append(contentsOf: needToAdd)
+                snapshot.appendSections([.main])
+                snapshot.deleteItems(local)
+                snapshot.appendItems(result, toSection: .main)
+                self?.dataSource.apply(snapshot, animatingDifferences: false)
+                self?.reloadCounter()
+            }
+
+            
+        }.resume()
+        
+        let awsURL = URL(string: "http://test-785213970.eu-west-2.elb.amazonaws.com/Targets")
+        let awsRequest = URLRequest(url: awsURL!, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 10)
+        URLSession.shared.dataTask(with: awsRequest) { [weak self] data, response, error in
+            guard let data = data,
+                  let response = try? JSONDecoder().decode(AWSControlResponse.self, from: data),
+                  let local = self?.models else {
+                      return
+                  }
+            var needToAdd = [AvalibilityViewModel]()
+            
+            for model in response.models {
+                guard let modelURL = URL(string: model.destination),
+                    local.contains(where: { $0.url == modelURL }) == false else {
+                    continue
+                }
+                
+                needToAdd.append(.init(name: modelURL.absoluteString, url: modelURL, available: false))
+            }
+            
+            guard needToAdd.isEmpty == false else {
+                return
+            }
+            
+            let result = self?.models ?? [] + needToAdd
             
             self?.updateTable {
                 var snapshot = Snapshot()
